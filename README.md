@@ -82,17 +82,20 @@ git -C ~/.codex/skills/prompt-author pull
 
 모드별 템플릿과 평가 패턴은 [references/prompt-patterns.md](references/prompt-patterns.md)에 있습니다.
 
-## 학습 웹사이트 실행
+## 학습 웹사이트: 클론 및 실행
 
-저장소를 내려받은 뒤 아래 명령으로 조건별 원칙·예시·실습 기능이 있는 웹사이트를 실행할 수 있습니다.
+조건별 원칙·예시·실습 기능이 있는 웹사이트를 로컬에서 실행하려면 Node.js 20 이상과 Git이 필요합니다.
 
 ```bash
-cd website
+git clone https://github.com/seominpapa/prompt-author.git
+cd prompt-author/website
 npm ci
 npm run dev
 ```
 
-브라우저에서 표시되는 로컬 주소를 열면 됩니다. 배포된 개인 링크를 사용할 수 있는 경우에는 [Prompt Author Lab](https://prompt-author-lab-kr.seominpapa.chatgpt.site)에서도 확인할 수 있습니다.
+명령 실행 후 터미널에 표시되는 로컬 주소를 브라우저에서 여세요. 일반적으로 `http://localhost:3000` 또는 `http://localhost:5173`입니다.
+
+설치 없이 확인하려면 [Prompt Author Lab](https://prompt-author-lab-kr.seominpapa.chatgpt.site)을 사용할 수 있습니다.
 
 ## 라이선스
 
