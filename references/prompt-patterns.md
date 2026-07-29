@@ -26,6 +26,32 @@ Answer the following subquestions:
 For each material claim, cite its source. Separate facts from inferences, state important gaps, and return {{report_format}}.
 ```
 
+## Image generation
+
+```markdown
+Create an image of {{subject}}.
+
+Visual treatment: {{style_lighting_palette}}
+Composition: {{camera_angle_framing}}
+Format: {{aspect_ratio_or_resolution}}
+Constraints: {{required_or_excluded_elements}}
+```
+
+State only visual details that materially affect the image. Avoid asking for readable text unless it is essential and the selected generator supports it reliably.
+
+## Video generation
+
+```markdown
+Create a {{duration}} video of {{scene_and_action}}.
+
+Camera and direction: {{camera_movement_pacing_lighting}}
+Sound: {{audio_direction}}
+Format: {{aspect_ratio_or_delivery_format}}
+Constraints: {{required_or_excluded_elements}}
+```
+
+Keep the action and camera direction coherent within one scene. Split a multi-scene sequence into separate shots when continuity matters.
+
 ## Structured output
 
 ```markdown

@@ -1,6 +1,6 @@
 ---
 name: prompt-author
-description: Create, rewrite, and evaluate ready-to-use prompts for chat, research, structured output, coding agents, tool-using agents, and autonomous harness loops. Use when a user asks to write or improve a prompt, system instructions, agent instructions, tool policy, loop contract, or prompt evaluation cases.
+description: Create, rewrite, and evaluate ready-to-use prompts for chat, research, image and video generation, structured output, coding agents, tool-using agents, and autonomous harness loops. Use when a user asks to write or improve a prompt, system instructions, agent instructions, tool policy, loop contract, or prompt evaluation cases.
 ---
 
 # Prompt Author
@@ -15,6 +15,8 @@ Classify the request before writing. Ask at most three questions only when the a
 | --- | --- | --- |
 | `casual` | ordinary Q&A, drafting, brainstorming | goal, audience, format |
 | `research` | current or source-backed reports | question, source scope, freshness, citation style |
+| `image` | image-generation prompts | subject, visual treatment and composition, aspect ratio and constraints |
+| `video` | video-generation prompts | scene and action, camera and direction, duration and format |
 | `structured` | API or machine-readable results | task, JSON Schema, invalid-input behavior |
 | `coding-agent` | repository changes and debugging | scope, constraints, verification command |
 | `tool-agent` | external tools or APIs | tools, authorization, tool-result handling |
@@ -23,6 +25,8 @@ Classify the request before writing. Ask at most three questions only when the a
 | `eval` | improving an existing prompt | prompt, failures, success rubric, representative cases |
 
 For a provider- or model-specific request, consult its current official prompting documentation before prescribing model parameters or API features. Do not hardcode transient model behavior.
+
+For `image`, describe the subject before style, then specify composition, lighting or motion only when material, and include aspect ratio or exclusions when needed. For `video`, keep each prompt to a coherent scene and action; add camera movement, pacing, audio, duration, and frame format only when they affect the result.
 
 ## Gather the contract
 
