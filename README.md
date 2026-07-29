@@ -29,7 +29,7 @@ git -C ~/.codex/skills/prompt-author pull
 ## 두 가지 사용 방법
 
 1. **스킬 설치** — 위 설치 방법으로 `$prompt-author`를 Codex에서 반복 사용합니다.
-2. **웹에서 즉시 생성** — [Prompt Author Lab](https://prompt-author-lab-kr.seominpapa.chatgpt.site)에서 조건을 입력하고, 생성된 프롬프트를 복사해 ChatGPT·Codex 등 원하는 도구에 붙여 넣습니다.
+2. **웹에서 즉시 생성** — [Prompt Author Lab](https://prompt-author-lab.vercel.app)에서 조건을 입력하고, 생성된 프롬프트를 복사해 ChatGPT·Codex 등 원하는 도구에 붙여 넣습니다.
 
 ## 사용 방법
 
@@ -95,7 +95,7 @@ npm run dev
 
 명령 실행 후 터미널에 표시되는 로컬 주소를 브라우저에서 여세요. 일반적으로 `http://localhost:3000` 또는 `http://localhost:5173`입니다.
 
-설치 없이 확인하려면 [Prompt Author Lab](https://prompt-author-lab-kr.seominpapa.chatgpt.site)을 사용할 수 있습니다.
+설치 없이 확인하려면 [Prompt Author Lab](https://prompt-author-lab.vercel.app)을 사용할 수 있습니다.
 
 ## 라이선스
 
