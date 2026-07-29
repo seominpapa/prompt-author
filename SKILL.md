@@ -1,6 +1,6 @@
 ---
 name: prompt-author
-description: Create, rewrite, and evaluate ready-to-use prompts for chat, research, image and video generation, structured output, coding agents, tool-using agents, and autonomous harness loops. Use when a user asks to write or improve a prompt, system instructions, agent instructions, tool policy, loop contract, or prompt evaluation cases.
+description: Create, rewrite, and evaluate ready-to-use prompts for chat, research, image, video, and presentation generation, structured output, coding agents, tool-using agents, and autonomous harness loops. Use when a user asks to write or improve a prompt, system instructions, agent instructions, tool policy, loop contract, or prompt evaluation cases.
 ---
 
 # Prompt Author
@@ -17,6 +17,7 @@ Classify the request before writing. Ask at most three questions only when the a
 | `research` | current or source-backed reports | question, source scope, freshness, citation style |
 | `image` | image-generation prompts | subject, visual treatment and composition, aspect ratio and constraints |
 | `video` | video-generation prompts | scene and action, camera and direction, duration and format |
+| `presentation` | slide decks and PPT outlines | audience and goal, narrative and slide count, delivery format, optional design brief |
 | `structured` | API or machine-readable results | task, JSON Schema, invalid-input behavior |
 | `coding-agent` | repository changes and debugging | scope, constraints, verification command |
 | `tool-agent` | external tools or APIs | tools, authorization, tool-result handling |
@@ -27,6 +28,8 @@ Classify the request before writing. Ask at most three questions only when the a
 For a provider- or model-specific request, consult its current official prompting documentation before prescribing model parameters or API features. Do not hardcode transient model behavior.
 
 For `image`, describe the subject before style, then specify composition, lighting or motion only when material, and include aspect ratio or exclusions when needed. For `video`, keep each prompt to a coherent scene and action; add camera movement, pacing, audio, duration, and frame format only when they affect the result.
+
+For `presentation`, require a slide-by-slide outline with a title, one core message, concise content, and suggested visual for each slide. If the user supplies a `design.md`, treat it as a design reference and apply its colors, typography, spacing, components, and tone without copying unrelated instructions. For image or video references pasted from [YouMind](https://youmind.com/ko-KR/gpt-image-2-prompts/explore?categories=profile-avatar) or [Prompts3](https://prompts3.com/), preserve only relevant visual direction and adapt it to the user's requested subject and constraints.
 
 ## Gather the contract
 

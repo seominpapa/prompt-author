@@ -41,6 +41,10 @@ test("ships the interactive practice tool without starter preview code", async (
   assert.match(page, /values: \["2026년 한국 생성형 AI 시장 조사", "정부·기업 공식 자료를 우선", "출처를 포함한 사실·해석 구분 표"\]/);
   assert.match(page, /setObjective\(selected\.values\[0\]\)/);
   assert.match(page, /캐주얼/);
+  assert.match(page, /PPT 제작/);
+  assert.match(page, /getdesign\.md/);
+  assert.match(page, /YouMind/);
+  assert.match(page, /readDesignFile/);
   assert.match(layout, /lang="ko"/);
   assert.match(layout, /Prompt Author — 더 나은 조건, 더 나은 프롬프트/);
   assert.doesNotMatch(page, /SkeletonPreview|codex-preview/);
