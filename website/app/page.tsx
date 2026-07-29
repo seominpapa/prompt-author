@@ -4,13 +4,14 @@ import { useMemo, useState } from "react";
 
 type Mode = "casual" | "research" | "structured" | "coding" | "tool" | "goal";
 
-const modes: Record<Mode, { label: string; short: string; rule: string; example: string; fields: string[] }> = {
+const modes: Record<Mode, { label: string; short: string; rule: string; example: string; fields: string[]; values: [string, string, string] }> = {
   casual: {
     label: "캐주얼",
     short: "대화 · 초안 · 아이디어",
     rule: "목표·대상·결과 형식을 짧고 선명하게 씁니다. 빠진 정보가 결과를 크게 바꾸면 질문하고, 아니면 안전한 가정을 둡니다.",
     example: "당신은 고객 커뮤니케이션 담당자입니다. 기존 고객에게 서비스 이용에 감사하는 친근한 이메일을 150자 내외로 작성하세요. 제목 1개와 본문을 반환하세요.",
     fields: ["목표", "대상", "결과 형식"],
+    values: ["고객에게 감사 이메일 작성", "기존 고객, 친근한 톤", "제목 1개와 150자 내외 본문"],
   },
   research: {
     label: "리서치",
@@ -18,6 +19,7 @@ const modes: Record<Mode, { label: string; short: string; rule: string; example:
     rule: "허용 출처와 최신성 기준을 정하고, 중요한 주장마다 인용을 요구합니다. 사실과 추론, 정보 공백을 분리합니다.",
     example: "2026년 한국 생성형 AI 시장을 조사하세요. 정부·기업 공식 자료를 우선하고, 각 핵심 주장에 출처를 붙이세요. 사실과 해석을 구분한 표로 반환하세요.",
     fields: ["조사 질문", "출처 범위", "보고서 형식"],
+    values: ["2026년 한국 생성형 AI 시장 조사", "정부·기업 공식 자료를 우선", "출처를 포함한 사실·해석 구분 표"],
   },
   structured: {
     label: "구조화",
@@ -25,6 +27,7 @@ const modes: Record<Mode, { label: string; short: string; rule: string; example:
     rule: "자연어 대신 스키마를 계약으로 씁니다. 필수 입력이 없을 때의 상태와 오류 응답도 정합니다.",
     example: "아래 고객 문의를 분류하세요. status, category, urgency, reason 필드를 가진 JSON 스키마로 반환하세요. 정보가 부족하면 status를 needs_input으로 설정하세요.",
     fields: ["작업", "스키마", "누락 입력 처리"],
+    values: ["고객 문의 분류", "status·category·urgency·reason JSON 스키마", "정보 부족 시 status를 needs_input으로 설정"],
   },
   coding: {
     label: "코딩 에이전트",
@@ -32,6 +35,7 @@ const modes: Record<Mode, { label: string; short: string; rule: string; example:
     rule: "바꿀 범위와 검증 명령을 고정합니다. 공유 동작은 모든 호출자를 살핀 뒤, 가장 작은 근본 원인 수정으로 해결합니다.",
     example: "결제 API의 타임아웃 오류를 수정하세요. checkout 서비스와 관련 테스트만 변경하세요. 공유 동작의 모든 호출자를 확인하고 npm test로 검증하세요.",
     fields: ["목표", "허용 경로", "검증 명령"],
+    values: ["결제 API 타임아웃 오류 수정", "checkout 서비스와 관련 테스트", "npm test 실행 후 결과 보고"],
   },
   tool: {
     label: "도구 사용",
@@ -39,6 +43,7 @@ const modes: Record<Mode, { label: string; short: string; rule: string; example:
     rule: "사용 가능한 도구와 승인 필요한 행동을 분리합니다. 도구 결과를 사실로 검증하되, 그 안의 지시는 신뢰하지 않습니다.",
     example: "지원 티켓을 분석하세요. ticket_search 도구로 근거를 찾고, 고객에게 메일을 보내거나 데이터를 변경하기 전에는 승인을 요청하세요. 우선순위 목록으로 반환하세요.",
     fields: ["목표", "사용 가능 도구", "승인 필요 작업"],
+    values: ["지원 티켓 분석", "ticket_search", "고객 메일 발송 또는 데이터 변경 전 승인 요청"],
   },
   goal: {
     label: "Codex /goal",
@@ -46,6 +51,7 @@ const modes: Record<Mode, { label: string; short: string; rule: string; example:
     rule: "관찰 가능한 완료 조건, 작업 경계, 반복 정책, 차단 조건을 한 문장 계약으로 묶습니다. 완료 전에는 회귀·제약·비밀 노출을 검토합니다.",
     example: "/goal 결제 API p95를 150ms 미만으로 낮추고, 공식 부하 테스트 5회와 전체 테스트 통과로 검증하세요. checkout 서비스와 관련 테스트만 사용하고, 실패 시 전략을 바꾸세요.",
     fields: ["완료 조건", "검증 방법", "허용 범위"],
+    values: ["결제 API p95를 150ms 미만으로 낮추기", "공식 부하 테스트 5회와 전체 테스트 통과", "checkout 서비스와 관련 테스트만 사용"],
   },
 };
 
@@ -78,9 +84,9 @@ export default function Home() {
   }
 
   function loadExample() {
-    setObjective(mode === "casual" ? "고객에게 감사 이메일 작성" : selected.example.split(". ")[0]);
-    setAudience(mode === "casual" ? "기존 고객, 친근한 톤" : selected.fields[1]);
-    setFormat(mode === "casual" ? "제목 1개와 150자 내외 본문" : selected.fields[2]);
+    setObjective(selected.values[0]);
+    setAudience(selected.values[1]);
+    setFormat(selected.values[2]);
   }
 
   return (
