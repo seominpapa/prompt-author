@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { readFile } from "node:fs/promises";
+import { access, readFile } from "node:fs/promises";
 import test from "node:test";
 
 async function render() {
@@ -43,4 +43,8 @@ test("ships the interactive practice tool without starter preview code", async (
   assert.match(layout, /Prompt Author — 더 나은 조건, 더 나은 프롬프트/);
   assert.doesNotMatch(page, /SkeletonPreview|codex-preview/);
   assert.doesNotMatch(packageJson, /react-loading-skeleton/);
+});
+
+test("writes a static entry page for Vercel", async () => {
+  await access(new URL("../dist/client/index.html", import.meta.url));
 });
