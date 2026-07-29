@@ -26,6 +26,11 @@ git clone https://github.com/seominpapa/prompt-author.git ~/.codex/skills/prompt
 git -C ~/.codex/skills/prompt-author pull
 ```
 
+## 두 가지 사용 방법
+
+1. **스킬 설치** — 위 설치 방법으로 `$prompt-author`를 Codex에서 반복 사용합니다.
+2. **웹에서 즉시 생성** — [Prompt Author Lab](https://prompt-author-lab-kr.seominpapa.chatgpt.site)에서 조건을 입력하고, 생성된 프롬프트를 복사해 ChatGPT·Codex 등 원하는 도구에 붙여 넣습니다.
+
 ## 사용 방법
 
 이 스킬이 설치된 환경에서 원하는 결과를 자연어로 요청하세요. 필요한 정보가 결과를 크게 바꾸는 경우에만 짧은 질문을 하고, 그렇지 않으면 안전한 가정을 명시한 뒤 바로 프롬프트를 작성합니다.

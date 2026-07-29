@@ -86,13 +86,13 @@ export default function Home() {
   return (
     <main>
       <section className="hero" id="top">
-        <nav><a className="brand" href="#top">prompt<span>author</span></a><a href="#practice">실습하기 <span aria-hidden>↘</span></a></nav>
+        <nav><a className="brand" href="#top">prompt<span>author</span></a><a href="#paths">사용 방법 <span aria-hidden>↘</span></a></nav>
         <div className="hero-grid">
           <div>
             <p className="eyebrow">PROMPT AS A CONTRACT</p>
             <h1>좋은 결과는<br /><em>좋은 조건</em>에서<br />시작됩니다.</h1>
             <p className="lede">Prompt Author는 막연한 요청을 목표·제약·검증이 담긴 바로 쓸 수 있는 프롬프트로 바꿉니다.</p>
-            <a className="primary" href="#practice">내 프롬프트 만들기 <span>→</span></a>
+            <a className="primary" href="#paths">두 가지 방법 보기 <span>→</span></a>
           </div>
           <div className="hero-card">
             <div className="card-top"><span className="pulse" /> LIVE PROMPT CHECK</div>
@@ -105,14 +105,22 @@ export default function Home() {
         </div>
       </section>
 
+      <section className="paths section" id="paths">
+        <div className="paths-heading"><p className="section-kicker">01 / CHOOSE YOUR PATH</p><h2>원하는 방식으로<br /><em>바로 시작</em>하세요.</h2><p>반복해서 프롬프트를 만들면 스킬을 설치하고, 지금 한 번의 프롬프트가 필요하면 웹에서 바로 생성하세요.</p></div>
+        <div className="path-cards">
+          <article className="path-card skill-path"><p className="mono">PATH 01</p><span className="path-number">01</span><h3>스킬을 내려받아<br />Codex에서 사용하기</h3><p>저장소를 설치하면 매 작업에서 <code>$prompt-author</code>로 상황에 맞는 프롬프트를 요청할 수 있습니다.</p><a href="https://github.com/seominpapa/prompt-author#설치-방법" target="_blank" rel="noreferrer">스킬 설치 방법 보기 <span>↗</span></a></article>
+          <article className="path-card web-path"><p className="mono">PATH 02</p><span className="path-number">02</span><h3>웹에서 만들고<br />바로 붙여넣기</h3><p>조건을 입력해 프롬프트를 생성한 뒤 <strong>복사하기</strong>를 누르고, ChatGPT·Codex 등 원하는 곳에 붙여넣으세요.</p><a href="#practice">웹에서 프롬프트 만들기 <span>→</span></a></article>
+        </div>
+      </section>
+
       <section className="section intro">
-        <p className="section-kicker">01 / PRINCIPLES</p>
+        <p className="section-kicker">02 / PRINCIPLES</p>
         <h2>조건이 다르면,<br />프롬프트의 <em>구조도</em> 달라집니다.</h2>
         <p className="section-copy">모든 요청에 긴 지침이 필요한 것은 아닙니다. 목적에 꼭 맞는 정보만 남기고, 불확실한 부분은 질문·가정·변수로 정직하게 처리합니다.</p>
       </section>
 
       <section className="mode-section section" id="modes">
-        <div className="mode-header"><p className="section-kicker">02 / MODE SELECTOR</p><p>상황을 선택해 원칙과 예시를 확인하세요.</p></div>
+        <div className="mode-header"><p className="section-kicker">03 / MODE SELECTOR</p><p>상황을 선택해 원칙과 예시를 확인하세요.</p></div>
         <div className="mode-layout">
           <div className="mode-list" role="tablist" aria-label="프롬프트 상황">
             {(Object.keys(modes) as Mode[]).map((key, i) => <button key={key} className={mode === key ? "active" : ""} onClick={() => setMode(key)} role="tab" aria-selected={mode === key}><span>0{i + 1}</span><strong>{modes[key].label}</strong><small>{modes[key].short}</small><i>↗</i></button>)}
@@ -128,14 +136,14 @@ export default function Home() {
       </section>
 
       <section className="section how">
-        <p className="section-kicker">03 / HOW IT WORKS</p>
+        <p className="section-kicker">04 / HOW IT WORKS</p>
         <h2>요청을 받으면<br />이렇게 <em>작동</em>합니다.</h2>
         <div className="flow">{flow.map((item, index) => <div key={item}><span>0{index + 1}</span><h3>{item}</h3><p>{index === 0 ? "요청 유형을 고릅니다." : index === 1 ? "결과를 바꾸는 정보만 확인합니다." : index === 2 ? "필요한 섹션만 조합합니다." : "형식과 사실성을 점검합니다."}</p></div>)}</div>
         <aside><strong>정보가 부족하면?</strong><span>결과를 크게 바꾸는 정보는 최대 3개까지 질문합니다. 그렇지 않으면 안전한 가정을 밝히거나 <code>{"{{변수}}"}</code>로 남겨 바로 사용할 수 있게 만듭니다.</span></aside>
       </section>
 
       <section className="practice section" id="practice">
-        <div className="practice-heading"><p className="section-kicker">04 / TRY IT YOURSELF</p><h2>이제, 당신의<br /><em>조건을 넣어보세요.</em></h2><p>입력값이 비어 있으면 변수로 남습니다. 복사한 뒤 원하는 도구에 바로 붙여 넣을 수 있습니다.</p></div>
+        <div className="practice-heading"><p className="section-kicker">05 / TRY IT YOURSELF</p><h2>이제, 당신의<br /><em>조건을 넣어보세요.</em></h2><p>입력값이 비어 있으면 변수로 남습니다. 생성된 프롬프트는 <strong>복사하기</strong>를 눌러 ChatGPT·Codex 등 원하는 도구에 바로 붙여 넣을 수 있습니다.</p></div>
         <div className="workbench">
           <div className="form-panel">
             <label>상황<select value={mode} onChange={(e) => setMode(e.target.value as Mode)}>{(Object.keys(modes) as Mode[]).map((key) => <option key={key} value={key}>{modes[key].label} — {modes[key].short}</option>)}</select></label>
