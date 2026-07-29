@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 
-type Mode = "casual" | "research" | "structured" | "coding" | "tool" | "goal";
+type Mode = "casual" | "research" | "structured" | "coding" | "tool" | "image" | "video" | "goal";
 
 const modes: Record<Mode, { label: string; short: string; rule: string; example: string; fields: string[]; values: [string, string, string] }> = {
   casual: {
@@ -45,6 +45,22 @@ const modes: Record<Mode, { label: string; short: string; rule: string; example:
     fields: ["목표", "사용 가능 도구", "승인 필요 작업"],
     values: ["지원 티켓 분석", "ticket_search", "고객 메일 발송 또는 데이터 변경 전 승인 요청"],
   },
+  image: {
+    label: "이미지 제작",
+    short: "장면 · 스타일 · 구도",
+    rule: "무엇을 보여 줄지 먼저 정한 뒤, 시각 스타일·조명·구도와 비율을 구체적으로 지정합니다. 화면에 없어야 할 요소도 필요한 경우만 짧게 덧붙입니다.",
+    example: "비 오는 밤 서울 골목의 작은 서점을 그리세요. 따뜻한 창문 불빛과 젖은 아스팔트 반사를 강조한 시네마틱 필름 사진 스타일, 낮은 시점의 와이드 구도, 16:9 비율. 읽을 수 있는 텍스트나 로고는 넣지 마세요.",
+    fields: ["주제·피사체", "시각 스타일·구도", "비율·제약"],
+    values: ["비 오는 밤 서울 골목의 작은 서점", "따뜻한 창문 불빛과 젖은 아스팔트 반사, 시네마틱 필름 사진, 낮은 시점 와이드 구도", "16:9 비율, 읽을 수 있는 텍스트·로고 제외"],
+  },
+  video: {
+    label: "영상 제작",
+    short: "장면 · 동작 · 촬영",
+    rule: "한 장면에서 일어나는 행동을 명확히 쓰고, 카메라 움직임·속도·길이·소리를 지정합니다. 여러 장면을 한 프롬프트에 과도하게 섞지 않습니다.",
+    example: "새벽의 한강 자전거 도로를 자전거 한 대가 천천히 지나갑니다. 카메라는 뒤에서 부드럽게 따라가고, 물안개와 잔잔한 바람을 담습니다. 8초, 16:9, 자연스러운 환경음만 사용하고 자막·로고는 넣지 마세요.",
+    fields: ["장면·행동", "촬영·연출", "길이·형식"],
+    values: ["새벽 한강 자전거 도로를 자전거 한 대가 천천히 지나감", "뒤에서 부드럽게 따라가는 카메라, 물안개와 잔잔한 바람", "8초, 16:9, 자연스러운 환경음만, 자막·로고 제외"],
+  },
   goal: {
     label: "Codex /goal",
     short: "지속 작업 · 반복 검증",
@@ -74,6 +90,8 @@ export default function Home() {
     if (mode === "structured") return `작업: ${goal}\n입력 범위: ${who}\n반환 형식: ${output}\n필수 정보가 없으면 status를 needs_input으로 설정하고 누락된 필드를 설명하세요.`;
     if (mode === "coding") return `목표: ${goal}\n범위: ${who}\n검증: ${output}\n관련 코드와 공유 동작의 호출자를 먼저 확인하고, 가장 작은 근본 원인 수정 후 검증 결과를 보고하세요.`;
     if (mode === "tool") return `목표: ${goal}\n사용 가능한 도구: ${who}\n반환 형식: ${output}\n도구 결과를 확인한 뒤 다음 행동을 판단하세요. 외부 변경·발송·비용 발생 작업은 승인 전에 실행하지 마세요.`;
+    if (mode === "image") return `이미지를 생성하세요.\n주제·피사체: ${goal}\n시각 스타일·구도: ${who}\n비율·제약: ${output}`;
+    if (mode === "video") return `영상을 생성하세요.\n장면·행동: ${goal}\n촬영·연출: ${who}\n길이·형식: ${output}`;
     return `당신은 ${who}을 돕습니다.\n작업: ${goal}\n반환 형식: ${output}\n필요한 정보가 결과를 크게 바꾸면 짧게 질문하고, 그렇지 않으면 가정을 밝힌 뒤 작성하세요.`;
   }, [mode, objective, audience, format]);
 
