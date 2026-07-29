@@ -77,6 +77,18 @@ git -C ~/.codex/skills/prompt-author pull
 
 모드별 템플릿과 평가 패턴은 [references/prompt-patterns.md](references/prompt-patterns.md)에 있습니다.
 
+## 학습 웹사이트 실행
+
+저장소를 내려받은 뒤 아래 명령으로 조건별 원칙·예시·실습 기능이 있는 웹사이트를 실행할 수 있습니다.
+
+```bash
+cd website
+npm ci
+npm run dev
+```
+
+브라우저에서 표시되는 로컬 주소를 열면 됩니다. 배포된 개인 링크를 사용할 수 있는 경우에는 [Prompt Author Lab](https://prompt-author-lab-kr.seominpapa.chatgpt.site)에서도 확인할 수 있습니다.
+
 ## 라이선스
 
 [MIT](LICENSE) 라이선스로 배포됩니다.
