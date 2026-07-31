@@ -2,8 +2,8 @@
 
 :root { --ink: #202119; --paper: #f6f4ec; --lime: #d9f148; --orange: #ff6540; --line: #c9c6b9; }
 * { box-sizing: border-box; }
-html { scroll-behavior: smooth; }
-body { margin: 0; background: var(--paper); color: var(--ink); font-family: Arial, Helvetica, sans-serif; }
+html { min-height: 100%; scroll-behavior: smooth; }
+body { min-height: 100vh; margin: 0; overflow-y: auto; background: var(--paper); color: var(--ink); font-family: Arial, Helvetica, sans-serif; }
 button, input, textarea, select { font: inherit; }
 button { cursor: pointer; }
 .hero { background: var(--ink); color: var(--paper); min-height: 760px; padding: 26px clamp(24px, 6vw, 96px) 70px; overflow: hidden; }

@@ -29,10 +29,11 @@ test("server-renders the Prompt Author learning page", async () => {
 });
 
 test("ships the interactive practice tool without starter preview code", async () => {
-  const [page, layout, packageJson] = await Promise.all([
+  const [page, layout, packageJson, css] = await Promise.all([
     readFile(new URL("../app/page.tsx", import.meta.url), "utf8"),
     readFile(new URL("../app/layout.tsx", import.meta.url), "utf8"),
     readFile(new URL("../package.json", import.meta.url), "utf8"),
+    readFile(new URL("../app/globals.css", import.meta.url), "utf8"),
   ]);
 
   assert.match(page, /"use client"/);
@@ -51,6 +52,7 @@ test("ships the interactive practice tool without starter preview code", async (
   assert.match(layout, /Prompt Author — 더 나은 조건, 더 나은 프롬프트/);
   assert.doesNotMatch(page, /SkeletonPreview|codex-preview/);
   assert.doesNotMatch(packageJson, /react-loading-skeleton/);
+  assert.match(css, /overflow-y:\s*auto/);
 });
 
 test("writes a static entry page for Vercel", async () => {
