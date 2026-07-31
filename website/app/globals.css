@@ -2,7 +2,7 @@
 
 :root { --ink: #202119; --paper: #f6f4ec; --lime: #d9f148; --orange: #ff6540; --line: #c9c6b9; }
 * { box-sizing: border-box; }
-html { min-height: 100%; }
+html { min-height: 100%; scroll-behavior: smooth; }
 body { min-height: 100vh; margin: 0; overflow-y: auto; background: var(--paper); color: var(--ink); font-family: Arial, Helvetica, sans-serif; }
 button, input, textarea, select { font: inherit; }
 button { cursor: pointer; }
@@ -25,3 +25,4 @@ h1, h2, h3, p { margin-top: 0; } h1, h2 { font-family: Georgia, "Times New Roman
 .mode-choices { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 17px; }.mode-choices button { border: 1px solid #a9a69c; background: #fffefa; padding: 8px 10px; font-size: 12px; }.mode-choices button.active { background: var(--ink); border-color: var(--ink); color: var(--paper); }
 footer { background: var(--ink); color: var(--paper); padding: 28px clamp(24px, 6vw, 96px); } footer p { margin: 0; color: #a8a89d; font: italic 15px Georgia, serif; }
 @media (max-width: 800px) { .hero { min-height: auto; }.hero-grid, .mode-layout, .workbench, .path-cards { grid-template-columns: 1fr; }.hero-grid { margin-top: 75px; }.hero-card { margin: 20px 8px; }.path-card { min-height: 295px; }.path-card h3 { font-size: 33px; }.mode-list { border-right: 0; }.mode-list button { grid-template-columns: 32px 1fr auto 20px; }.mode-list button small { display: none; }.mode-detail { padding: 30px 18px; }.mode-header { display: block; }.flow { grid-template-columns: 1fr 1fr; }.flow div:nth-child(2) { border-right: 0; }.flow div:nth-child(n+3) { border-top: 1px solid var(--ink); }.how aside { grid-template-columns: 1fr; gap: 8px; }.section { padding-top: 80px; padding-bottom: 80px; } footer { gap: 15px; flex-wrap: wrap; } }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }

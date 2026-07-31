@@ -82,7 +82,8 @@ const modes: Record<Mode, { label: string; short: string; rule: string; example:
 const flow = ["요청 분류", "계약 수집", "프롬프트 작성", "검증·전달"];
 
 export default function Home() {
-  const [mode, setMode] = useState<Mode>("casual");
+  const [guideMode, setGuideMode] = useState<Mode>("casual");
+  const [practiceMode, setPracticeMode] = useState<Mode>("casual");
   const [objective, setObjective] = useState("");
   const [audience, setAudience] = useState("");
   const [format, setFormat] = useState("");
@@ -90,21 +91,22 @@ export default function Home() {
   const [designBrief, setDesignBrief] = useState("");
   const [copied, setCopied] = useState(false);
 
-  const selected = modes[mode];
+  const selected = modes[guideMode];
+  const practiceSelected = modes[practiceMode];
   const practicePrompt = useMemo(() => {
     const goal = objective || "{{목표}}";
     const who = audience || "{{대상 또는 맥락}}";
     const output = format || "{{결과 형식}}";
-    if (mode === "goal") return `/goal ${goal}, ${who}로 검증하세요. ${output}만 사용하세요. 반복마다 실제 상태를 확인하고 실패하면 전략을 바꾸세요. 완료 전 회귀·제약·비밀 노출을 검토하세요.`;
-    if (mode === "research") return `${goal}을(를) ${who}을 위해 조사하세요. 최신성이 필요한 주장은 확인하고, 각 핵심 주장에 출처를 붙이세요. 사실과 추론을 구분해 ${output}(으)로 반환하세요.`;
-    if (mode === "structured") return `작업: ${goal}\n입력 범위: ${who}\n반환 형식: ${output}\n필수 정보가 없으면 status를 needs_input으로 설정하고 누락된 필드를 설명하세요.`;
-    if (mode === "coding") return `목표: ${goal}\n범위: ${who}\n검증: ${output}\n관련 코드와 공유 동작의 호출자를 먼저 확인하고, 가장 작은 근본 원인 수정 후 검증 결과를 보고하세요.`;
-    if (mode === "tool") return `목표: ${goal}\n사용 가능한 도구: ${who}\n반환 형식: ${output}\n도구 결과를 확인한 뒤 다음 행동을 판단하세요. 외부 변경·발송·비용 발생 작업은 승인 전에 실행하지 마세요.`;
-    if (mode === "image") return `이미지를 생성하세요.\n주제·피사체: ${goal}\n시각 스타일·구도: ${who}\n비율·제약: ${output}${referencePrompt ? `\n\n아래 레퍼런스 프롬프트의 분위기·구도·디테일을 참고하되, 피사체와 요청 조건에 맞게 새로 작성하세요.\n레퍼런스:\n${referencePrompt}` : ""}`;
-    if (mode === "video") return `영상을 생성하세요.\n장면·행동: ${goal}\n촬영·연출: ${who}\n길이·형식: ${output}${referencePrompt ? `\n\n아래 레퍼런스 프롬프트의 연출·카메라·리듬을 참고하되, 요청 조건에 맞게 새로 작성하세요.\n레퍼런스:\n${referencePrompt}` : ""}`;
-    if (mode === "presentation") return `프레젠테이션을 제작하세요.\n발표 목표·청중: ${goal}\n핵심 메시지·구성: ${who}\n분량·결과 형식: ${output}\n각 슬라이드에 제목, 한 줄 핵심 메시지, 본문 요점, 권장 시각 자료를 제시하세요.${designBrief ? `\n\n다음 design.md의 디자인 설명을 발표 자료의 색상·타이포그래피·간격·컴포넌트·톤에 반영하세요:\n${designBrief}` : ""}`;
+    if (practiceMode === "goal") return `/goal ${goal}, ${who}로 검증하세요. ${output}만 사용하세요. 반복마다 실제 상태를 확인하고 실패하면 전략을 바꾸세요. 완료 전 회귀·제약·비밀 노출을 검토하세요.`;
+    if (practiceMode === "research") return `${goal}을(를) ${who}을 위해 조사하세요. 최신성이 필요한 주장은 확인하고, 각 핵심 주장에 출처를 붙이세요. 사실과 추론을 구분해 ${output}(으)로 반환하세요.`;
+    if (practiceMode === "structured") return `작업: ${goal}\n입력 범위: ${who}\n반환 형식: ${output}\n필수 정보가 없으면 status를 needs_input으로 설정하고 누락된 필드를 설명하세요.`;
+    if (practiceMode === "coding") return `목표: ${goal}\n범위: ${who}\n검증: ${output}\n관련 코드와 공유 동작의 호출자를 먼저 확인하고, 가장 작은 근본 원인 수정 후 검증 결과를 보고하세요.`;
+    if (practiceMode === "tool") return `목표: ${goal}\n사용 가능한 도구: ${who}\n반환 형식: ${output}\n도구 결과를 확인한 뒤 다음 행동을 판단하세요. 외부 변경·발송·비용 발생 작업은 승인 전에 실행하지 마세요.`;
+    if (practiceMode === "image") return `이미지를 생성하세요.\n주제·피사체: ${goal}\n시각 스타일·구도: ${who}\n비율·제약: ${output}${referencePrompt ? `\n\n아래 레퍼런스 프롬프트의 분위기·구도·디테일을 참고하되, 피사체와 요청 조건에 맞게 새로 작성하세요.\n레퍼런스:\n${referencePrompt}` : ""}`;
+    if (practiceMode === "video") return `영상을 생성하세요.\n장면·행동: ${goal}\n촬영·연출: ${who}\n길이·형식: ${output}${referencePrompt ? `\n\n아래 레퍼런스 프롬프트의 연출·카메라·리듬을 참고하되, 요청 조건에 맞게 새로 작성하세요.\n레퍼런스:\n${referencePrompt}` : ""}`;
+    if (practiceMode === "presentation") return `프레젠테이션을 제작하세요.\n발표 목표·청중: ${goal}\n핵심 메시지·구성: ${who}\n분량·결과 형식: ${output}\n각 슬라이드에 제목, 한 줄 핵심 메시지, 본문 요점, 권장 시각 자료를 제시하세요.${designBrief ? `\n\n다음 design.md의 디자인 설명을 발표 자료의 색상·타이포그래피·간격·컴포넌트·톤에 반영하세요:\n${designBrief}` : ""}`;
     return `당신은 ${who}을 돕습니다.\n작업: ${goal}\n반환 형식: ${output}\n필요한 정보가 결과를 크게 바꾸면 짧게 질문하고, 그렇지 않으면 가정을 밝힌 뒤 작성하세요.`;
-  }, [mode, objective, audience, format]);
+  }, [practiceMode, objective, audience, format, referencePrompt, designBrief]);
 
   async function copyPrompt() {
     await navigator.clipboard.writeText(practicePrompt);
@@ -113,9 +115,9 @@ export default function Home() {
   }
 
   function loadExample() {
-    setObjective(selected.values[0]);
-    setAudience(selected.values[1]);
-    setFormat(selected.values[2]);
+    setObjective(practiceSelected.values[0]);
+    setAudience(practiceSelected.values[1]);
+    setFormat(practiceSelected.values[2]);
   }
 
   function readDesignFile(file: File | undefined) {
@@ -165,7 +167,7 @@ export default function Home() {
         <div className="mode-header"><p className="section-kicker">03 / MODE SELECTOR</p><p>상황을 선택해 원칙과 예시를 확인하세요.</p></div>
         <div className="mode-layout">
           <div className="mode-list" role="tablist" aria-label="프롬프트 상황">
-            {(Object.keys(modes) as Mode[]).map((key, i) => <button key={key} className={mode === key ? "active" : ""} onClick={() => setMode(key)} role="tab" aria-selected={mode === key}><span>0{i + 1}</span><strong>{modes[key].label}</strong><small>{modes[key].short}</small><i>↗</i></button>)}
+            {(Object.keys(modes) as Mode[]).map((key, i) => <button type="button" key={key} className={guideMode === key ? "active" : ""} onClick={() => setGuideMode(key)} role="tab" aria-selected={guideMode === key}><span>0{i + 1}</span><strong>{modes[key].label}</strong><small>{modes[key].short}</small><i>↗</i></button>)}
           </div>
           <article className="mode-detail">
             <p className="detail-tag">{selected.label.toUpperCase()} MODE</p>
@@ -188,12 +190,12 @@ export default function Home() {
         <div className="practice-heading"><p className="section-kicker">05 / TRY IT YOURSELF</p><h2>이제, 당신의<br /><em>조건을 넣어보세요.</em></h2><p>입력값이 비어 있으면 변수로 남습니다. 생성된 프롬프트는 <strong>복사하기</strong>를 눌러 ChatGPT·Codex 등 원하는 도구에 바로 붙여 넣을 수 있습니다.</p></div>
         <div className="workbench" id="workbench">
           <div className="form-panel">
-            <div className="mode-choices" role="group" aria-label="상황">{(Object.keys(modes) as Mode[]).map((key) => <button type="button" key={key} className={mode === key ? "active" : ""} onClick={() => setMode(key)}>{modes[key].label}</button>)}</div>
-            <label>{selected.fields[0]}<textarea value={objective} onChange={(e) => setObjective(e.target.value)} placeholder="무엇을 이루고 싶나요?" rows={3} /></label>
-            <label>{selected.fields[1]}<input value={audience} onChange={(e) => setAudience(e.target.value)} placeholder="누구를 위한 것인가요?" /></label>
-            <label>{selected.fields[2]}<input value={format} onChange={(e) => setFormat(e.target.value)} placeholder="어떤 형태로 받을까요?" /></label>
-            {(mode === "image" || mode === "video") && <><p className="reference-help">레퍼런스가 필요하면 <a href="https://youmind.com/ko-KR/gpt-image-2-prompts/explore?categories=profile-avatar" target="_blank" rel="noreferrer">YouMind</a> 또는 <a href="https://prompts3.com/" target="_blank" rel="noreferrer">Prompts3</a>에서 마음에 드는 프롬프트를 찾아 복사해 붙여 넣으세요.</p><label>레퍼런스 프롬프트<textarea value={referencePrompt} onChange={(e) => setReferencePrompt(e.target.value)} placeholder="참고할 프롬프트를 붙여 넣으세요." rows={4} /></label></>}
-            {mode === "presentation" && <><p className="reference-help"><a href="https://getdesign.md/" target="_blank" rel="noreferrer">getdesign.md</a>에서 디자인 기준을 찾거나, 가진 design.md 파일을 선택하세요. 내용은 이 브라우저에서만 읽습니다.</p><label>design.md 업로드<input type="file" accept=".md,text/markdown,text/plain" onChange={(e) => readDesignFile(e.target.files?.[0])} /></label>{designBrief && <p className="file-status">design.md 디자인 설명을 프롬프트에 반영합니다.</p>}</>}
+            <div className="mode-choices" role="group" aria-label="상황">{(Object.keys(modes) as Mode[]).map((key) => <button type="button" key={key} className={practiceMode === key ? "active" : ""} onClick={() => setPracticeMode(key)}>{modes[key].label}</button>)}</div>
+            <label>{practiceSelected.fields[0]}<textarea value={objective} onChange={(e) => setObjective(e.target.value)} placeholder="무엇을 이루고 싶나요?" rows={3} /></label>
+            <label>{practiceSelected.fields[1]}<input value={audience} onChange={(e) => setAudience(e.target.value)} placeholder="누구를 위한 것인가요?" /></label>
+            <label>{practiceSelected.fields[2]}<input value={format} onChange={(e) => setFormat(e.target.value)} placeholder="어떤 형태로 받을까요?" /></label>
+            {(practiceMode === "image" || practiceMode === "video") && <><p className="reference-help">레퍼런스가 필요하면 <a href="https://youmind.com/ko-KR/gpt-image-2-prompts/explore?categories=profile-avatar" target="_blank" rel="noreferrer">YouMind</a> 또는 <a href="https://prompts3.com/" target="_blank" rel="noreferrer">Prompts3</a>에서 마음에 드는 프롬프트를 찾아 복사해 붙여 넣으세요.</p><label>레퍼런스 프롬프트<textarea value={referencePrompt} onChange={(e) => setReferencePrompt(e.target.value)} placeholder="참고할 프롬프트를 붙여 넣으세요." rows={4} /></label></>}
+            {practiceMode === "presentation" && <><p className="reference-help"><a href="https://getdesign.md/" target="_blank" rel="noreferrer">getdesign.md</a>에서 디자인 기준을 찾거나, 가진 design.md 파일을 선택하세요. 내용은 이 브라우저에서만 읽습니다.</p><label>design.md 업로드<input type="file" accept=".md,text/markdown,text/plain" onChange={(e) => readDesignFile(e.target.files?.[0])} /></label>{designBrief && <p className="file-status">design.md 디자인 설명을 프롬프트에 반영합니다.</p>}</>}
             <button className="ghost" onClick={loadExample}>예시 조건 채우기 <span>↗</span></button>
           </div>
           <div className="output-panel"><div className="output-top"><span className="mono">YOUR PROMPT</span><button onClick={copyPrompt}>{copied ? "복사됨!" : "복사하기"}</button></div><pre>{practicePrompt}</pre><p className="output-note">{objective && audience && format ? "조건이 모두 채워졌습니다. 이 프롬프트를 사용해 보세요." : "빈 조건은 {{변수}}로 남겨 두었습니다."}</p></div>
