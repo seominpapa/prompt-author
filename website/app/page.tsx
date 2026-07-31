@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 type Mode = "casual" | "research" | "structured" | "coding" | "tool" | "image" | "video" | "presentation" | "goal";
 
@@ -90,6 +90,7 @@ export default function Home() {
   const [referencePrompt, setReferencePrompt] = useState("");
   const [designBrief, setDesignBrief] = useState("");
   const [copied, setCopied] = useState(false);
+  const designReadId = useRef(0);
 
   useEffect(() => {
     function cancelSmoothScroll() {
@@ -144,10 +145,26 @@ export default function Home() {
     setFormat(practiceSelected.values[2]);
   }
 
+  function selectPracticeMode(nextMode: Mode) {
+    if (nextMode === practiceMode) return;
+    setPracticeMode(nextMode);
+    setObjective("");
+    setAudience("");
+    setFormat("");
+    setReferencePrompt("");
+    setDesignBrief("");
+    designReadId.current += 1;
+    setCopied(false);
+  }
+
   function readDesignFile(file: File | undefined) {
     if (!file) return;
+    const readId = ++designReadId.current;
     const reader = new FileReader();
-    reader.onload = () => setDesignBrief(String(reader.result ?? ""));
+    reader.onload = () => {
+      if (readId !== designReadId.current) return;
+      setDesignBrief(String(reader.result ?? ""));
+    };
     reader.readAsText(file);
   }
 
@@ -214,7 +231,7 @@ export default function Home() {
         <div className="practice-heading"><p className="section-kicker">05 / TRY IT YOURSELF</p><h2>이제, 당신의<br /><em>조건을 넣어보세요.</em></h2><p>입력값이 비어 있으면 변수로 남습니다. 생성된 프롬프트는 <strong>복사하기</strong>를 눌러 ChatGPT·Codex 등 원하는 도구에 바로 붙여 넣을 수 있습니다.</p></div>
         <div className="workbench" id="workbench">
           <div className="form-panel">
-            <div className="mode-choices" role="group" aria-label="상황">{(Object.keys(modes) as Mode[]).map((key) => <button type="button" key={key} className={practiceMode === key ? "active" : ""} onClick={() => setPracticeMode(key)}>{modes[key].label}</button>)}</div>
+            <div className="mode-choices" role="group" aria-label="상황">{(Object.keys(modes) as Mode[]).map((key) => <button type="button" key={key} className={practiceMode === key ? "active" : ""} onClick={() => selectPracticeMode(key)}>{modes[key].label}</button>)}</div>
             <label>{practiceSelected.fields[0]}<textarea value={objective} onChange={(e) => setObjective(e.target.value)} placeholder="무엇을 이루고 싶나요?" rows={3} /></label>
             <label>{practiceSelected.fields[1]}<input value={audience} onChange={(e) => setAudience(e.target.value)} placeholder="누구를 위한 것인가요?" /></label>
             <label>{practiceSelected.fields[2]}<input value={format} onChange={(e) => setFormat(e.target.value)} placeholder="어떤 형태로 받을까요?" /></label>
