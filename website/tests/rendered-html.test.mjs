@@ -48,6 +48,8 @@ test("ships the interactive practice tool without starter preview code", async (
   assert.match(page, /readDesignFile/);
   assert.match(page, /className="mode-choices"/);
   assert.match(page, /onClick=\{\(\) => setMode\(key\)\}/);
+  assert.match(page, /href="#workbench"/);
+  assert.doesNotMatch(css, /scroll-behavior:\s*smooth/);
   assert.match(layout, /lang="ko"/);
   assert.match(layout, /Prompt Author — 더 나은 조건, 더 나은 프롬프트/);
   assert.doesNotMatch(page, /SkeletonPreview|codex-preview/);
