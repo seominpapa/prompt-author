@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 type Mode = "casual" | "research" | "structured" | "coding" | "tool" | "image" | "video" | "presentation" | "goal";
 
@@ -90,6 +90,30 @@ export default function Home() {
   const [referencePrompt, setReferencePrompt] = useState("");
   const [designBrief, setDesignBrief] = useState("");
   const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    function cancelSmoothScroll() {
+      const root = document.documentElement;
+      root.style.scrollBehavior = "auto";
+      window.scrollTo(window.scrollX, window.scrollY);
+      window.requestAnimationFrame(() => root.style.removeProperty("scroll-behavior"));
+    }
+
+    function cancelSmoothScrollFromKey(event: KeyboardEvent) {
+      const target = event.target;
+      if (target instanceof HTMLElement && target.matches("input, textarea, select, [contenteditable='true']")) return;
+      if (["ArrowUp", "ArrowDown", "PageUp", "PageDown", "Home", "End", " "].includes(event.key)) cancelSmoothScroll();
+    }
+
+    window.addEventListener("wheel", cancelSmoothScroll, { passive: true });
+    window.addEventListener("touchstart", cancelSmoothScroll, { passive: true });
+    window.addEventListener("keydown", cancelSmoothScrollFromKey);
+    return () => {
+      window.removeEventListener("wheel", cancelSmoothScroll);
+      window.removeEventListener("touchstart", cancelSmoothScroll);
+      window.removeEventListener("keydown", cancelSmoothScrollFromKey);
+    };
+  }, []);
 
   const selected = modes[guideMode];
   const practiceSelected = modes[practiceMode];

@@ -53,6 +53,11 @@ test("ships the interactive practice tool without starter preview code", async (
   assert.match(page, /onClick=\{\(\) => setPracticeMode\(key\)\}/);
   assert.doesNotMatch(page, /const \[mode, setMode\]/);
   assert.match(page, /href="#workbench"/);
+  assert.match(page, /function cancelSmoothScroll\(\)/);
+  assert.match(page, /addEventListener\("wheel", cancelSmoothScroll/);
+  assert.match(page, /addEventListener\("touchstart", cancelSmoothScroll/);
+  assert.match(page, /addEventListener\("keydown", cancelSmoothScrollFromKey/);
+  assert.match(page, /window\.scrollTo\(window\.scrollX, window\.scrollY\)/);
   assert.match(css, /html\s*\{[^}]*scroll-behavior:\s*smooth/);
   assert.match(css, /@media\s*\(prefers-reduced-motion:\s*reduce\)[^{]*\{[^}]*html\s*\{[^}]*scroll-behavior:\s*auto/);
   assert.match(layout, /lang="ko"/);
