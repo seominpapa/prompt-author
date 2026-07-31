@@ -53,7 +53,7 @@ test("ships the interactive practice tool without starter preview code", async (
   assert.doesNotMatch(page, /SkeletonPreview|codex-preview/);
   assert.doesNotMatch(packageJson, /react-loading-skeleton/);
   assert.match(css, /overflow-y:\s*auto/);
-  assert.match(css, /\.practice[^}]*overflow-y:\s*auto/);
+  assert.doesNotMatch(css, /\.practice[^}]*overflow-y:\s*auto/);
 });
 
 test("writes a static entry page for Vercel", async () => {
