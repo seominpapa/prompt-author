@@ -1,6 +1,6 @@
 # Prompt patterns
 
-Use the smallest matching template. Fill known values, leave unresolved inputs as `{{double_braces}}`, and list them; remove sections that do not apply. `/goal` is an additional persistent-work pattern; it does not replace casual, research, structured, coding-agent, tool-agent, harness-loop, or evaluation templates.
+Use the smallest matching template. Fill known values, leave unresolved inputs as `{{double_braces}}`, and list them; remove sections that do not apply. Codex and Claude Code both support `/goal` as an additional persistent-work pattern; it does not replace casual, research, structured, code, coding-agent, tool-agent, harness-loop, or evaluation templates.
 
 ## Casual
 
@@ -12,6 +12,8 @@ Context: {{context}}
 Constraints: {{constraints}}
 Return: {{output_format}}
 ```
+
+When a factual claim or judgment materially affects the result, add: verify important claims against {{evidence_source}}, separate verified facts from uncertainty and assumptions, and mark any decision that requires human confirmation. Omit this for low-stakes drafting where it adds no value.
 
 ## Research
 
@@ -77,9 +79,21 @@ Return data conforming to this schema:
 {{json_schema}}
 ```
 
-Validate schema compliance in code. Treat schema-valid output as untrusted until its business rules are also checked.
+Define field types, required fields, allowed values, nested structures, and missing or invalid input behavior. Validate schema compliance in code. Treat schema-valid output as untrusted until its business rules are also checked.
 
-## Coding agent
+## Code writing and explanation
+
+```markdown
+Create or explain {{code_task}} using {{language_framework_and_runtime}}.
+
+Inputs and expected outputs: {{input_output_contract}}
+Edge cases: {{edge_cases}}
+Performance and security constraints: {{constraints}}
+
+Return {{code_or_explanation_format}} with a runnable example or test using {{verification_method}}.
+```
+
+## Codex and Claude Code repository agent
 
 ```markdown
 Objective: {{objective}}
@@ -106,6 +120,8 @@ Ask for approval before: {{approval_actions}}
 Return: {{output_format}}
 ```
 
+Specify which read-only actions are safe to run automatically, which create, update, send, delete, or paid actions require approval, how to validate tool results, and when to change strategy or stop after errors. Never place credentials in the prompt or final report.
+
 ## Harness loop
 
 ```markdown
@@ -125,9 +141,9 @@ Request approval before {{approval_actions}}. Stop when the goal is verified, re
 Return a final status with `completed`, `blocked`, or `needs_approval`, plus evidence.
 ```
 
-## Codex Goal extension (`/goal`)
+## Codex and Claude Code Goal extension (`/goal`)
 
-Use this extension only for durable, multi-turn work. Keep the other mode's task-specific structure where relevant: for example, retain a JSON Schema for structured work, source/citation rules for research, or scoped paths and test commands for coding. Public documentation does not specify an objective-text limit. `token_budget` is separate and should be supplied only when the user explicitly asks for one.
+Use this extension only for durable, multi-turn work. Keep the other mode's task-specific structure where relevant: for example, retain a JSON Schema for structured work, source/citation rules for research, or scoped paths and test commands for coding. The same `/goal` line is portable across Codex and Claude Code, but follow each environment's lifecycle controls. In Codex, supply a separate `token_budget` only when explicitly requested. In Claude Code, one goal can be active per session, a new goal replaces the active goal, the condition text is limited to 4,000 characters, and verification evidence must appear in the conversation for the evaluator to assess it.
 
 ```markdown
 /goal {{outcome}}, verified by {{exact_test_benchmark_or_artifact}}, while preserving {{non_negotiable_constraints}}. Use only {{allowed_paths_tools_and_scope}}. Between iterations, inspect live state, select the highest-evidence next action, record before/after evidence, and change strategy after a failed check. Before completion, perform an adversarial review for regressions, constraint violations, and secret exposure. If blocked or no valid in-scope path remains, stop and report attempted paths, evidence, blocker, and exact input needed. Final report: changed files, exact verification commands and results, remaining risks, confidence.
@@ -145,6 +161,20 @@ Avoid:
 /goal Research every option, write code, publish it, and keep improving forever.
 ```
 
+## Prompt evaluation and improvement
+
+```markdown
+Improve this prompt:
+{{original_prompt}}
+
+Observed result or failure: {{observed_result}}
+Expected result and rubric: {{expected_result_and_rubric}}
+
+Check for unsupported claims, mixed facts and inference, omitted uncertainty, and decisions that require human confirmation. Change one likely cause at a time and compare the revised prompt against representative, edge, failure, and prior-regression cases.
+
+Return the revised prompt, a concise before/after explanation, evaluation cases, and any remaining limitation.
+```
+
 ## Evaluation cases
 
 Generate a small table for every non-trivial prompt:
@@ -158,4 +188,4 @@ Generate a small table for every non-trivial prompt:
 
 ## Revision protocol
 
-When improving a prompt, obtain the original prompt, observed output, expected behavior, and a check. Change one cause at a time, rerun the same cases, and keep the revision only if it improves the target without regressions.
+When improving a prompt, obtain the original prompt, observed output, expected behavior, and a check. Audit evidence, uncertainty, assumptions, and human-review needs when they affect the result. Change one cause at a time, rerun the same cases, and keep the revision only if it improves the target without regressions.

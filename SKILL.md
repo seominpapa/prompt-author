@@ -1,6 +1,6 @@
 ---
 name: prompt-author
-description: Create, rewrite, and evaluate ready-to-use prompts for chat, research, image, video, and presentation generation, structured output, coding agents, tool-using agents, and autonomous harness loops. Use when a user asks to write or improve a prompt, system instructions, agent instructions, tool policy, loop contract, or prompt evaluation cases.
+description: Create, rewrite, and evaluate ready-to-use prompts for Codex, Claude Code, chat, research, image, video, and presentation generation, structured output, coding agents, tool-using agents, and autonomous harness loops. Use when a user asks to write or improve a prompt, system instructions, agent instructions, tool policy, loop contract, or prompt evaluation cases.
 ---
 
 # Prompt Author
@@ -13,19 +13,22 @@ Classify the request before writing. Ask at most three questions only when the a
 
 | Mode | Use for | Required inputs |
 | --- | --- | --- |
-| `casual` | ordinary Q&A, drafting, brainstorming | goal, audience, format |
+| `casual` | ordinary Q&A, drafting, brainstorming | goal, audience, format, optional evidence and human-review needs |
 | `research` | current or source-backed reports | question, source scope, freshness, citation style |
 | `image` | image-generation prompts | subject, visual treatment and composition, aspect ratio and constraints |
 | `video` | video-generation prompts | scene and action, camera and direction, duration and format |
 | `presentation` | slide decks and PPT outlines | audience and goal, narrative and slide count, delivery format, optional design brief |
-| `structured` | API or machine-readable results | task, JSON Schema, invalid-input behavior |
-| `coding-agent` | repository changes and debugging | scope, constraints, verification command |
-| `tool-agent` | external tools or APIs | tools, authorization, tool-result handling |
+| `structured` | API or machine-readable results | task, field types and allowed values, JSON Schema, invalid-input behavior |
+| `code` | code writing, explanation, and review | language and runtime, inputs and outputs, edge cases, verification |
+| `coding-agent` | Codex or Claude Code repository changes and debugging | scope, preserved behavior, constraints, verification command |
+| `tool-agent` | external tools or APIs | tools and data scope, authorization, result validation, failure handling |
 | `harness-loop` | multi-step autonomous work | measurable goal, checks, budget, approvals, stop conditions |
-| `goal` | Codex Goal (`/goal`) for durable work | one durable objective, completion test, blocked condition, optional explicit token budget |
-| `eval` | improving an existing prompt | prompt, failures, success rubric, representative cases |
+| `goal` | Codex or Claude Code Goal (`/goal`) for durable work | one durable objective, completion test, blocked condition, optional platform-specific budget |
+| `eval` | improving an existing prompt | prompt, observed failures, expected result, evidence and uncertainty gaps, success rubric, representative cases |
 
 For a provider- or model-specific request, consult its current official prompting documentation before prescribing model parameters or API features. Do not hardcode transient model behavior.
+
+For `casual`, add verification only when a factual claim or judgment materially affects the result. Ask for evidence, separate verified facts, uncertainty, and assumptions, and flag legal, medical, financial, external-action, or other consequential decisions for human review. For `eval`, explicitly check for unsupported claims, mixed facts and inference, omitted uncertainty, and decisions that require human confirmation.
 
 For `image`, describe the subject before style, then specify composition, lighting or motion only when material, and include aspect ratio or exclusions when needed. For `video`, keep each prompt to a coherent scene and action; add camera movement, pacing, audio, duration, and frame format only when they affect the result.
 
@@ -40,6 +43,7 @@ Collect or infer these fields:
 3. **Constraints** — scope, tone, completeness, time, cost, and things that must not change.
 4. **Output** — human-readable format or a schema.
 5. **Success check** — test, rubric, citation check, schema validation, or human review.
+6. **Evidence and uncertainty** — when material, the required evidence, unresolved uncertainty, assumptions, and decisions reserved for a person.
 
 For agents, additionally collect available tools, safe autonomous actions, actions requiring approval, retry budget, and stop conditions. For `goal`, make the contract explicit as six elements: outcome, verification surface, constraints, boundaries, iteration policy, and blocked stop condition.
 
@@ -62,7 +66,7 @@ Prefer direct positive instructions. Add examples only when they encode a requir
 
 Read [references/prompt-patterns.md](references/prompt-patterns.md) for mode templates and evaluation patterns.
 
-## Codex Goal extension (`/goal`)
+## Codex and Claude Code Goal extension (`/goal`)
 
 Use `goal` as the persistent-work extension of the same prompt-author workflow, not as a replacement for the other modes. Before writing, extract the six required elements: **Outcome**, **verification surface**, **constraints**, **boundaries**, **iteration policy**, and **blocked stop condition**. Ask at most two questions only when a missing answer changes the goal; otherwise write safe placeholders.
 
@@ -70,8 +74,8 @@ Use `goal` as the persistent-work extension of the same prompt-author workflow, 
 - Verify against the live machine, repository, tests, benchmarks, or generated artifacts—not memory or an assumed state.
 - Preserve secrets: never print, copy, commit, or include credentials in prompts, logs, reports, or artifacts.
 - Require an adversarial review gate before completion. Use an independent sub-agent when available; otherwise perform an explicit self-review against constraints, regressions, and secret exposure.
-- A `token_budget` is a separate positive number. Include it only when the user explicitly requests one; it is not a text-length limit. Public documentation currently does not publish an objective-text limit, so do not invent one.
-- Do not replace an unfinished goal. Mark complete only after the verification surface passes. Mark blocked only when no valid in-scope path remains, then report attempts, evidence, blocker, and the exact input needed.
+- Follow the target platform's goal lifecycle. In Codex, include a separate positive `token_budget` only when the user explicitly requests one. In Claude Code, `/goal` supports one active goal per session, a new goal replaces the active goal, and the condition text is limited to 4,000 characters.
+- Keep verification evidence in the conversation because Claude Code's goal evaluator does not independently run tools or read files. Mark complete only after the verification surface passes. Mark blocked only when no valid in-scope path remains, then report attempts, evidence, blocker, and the exact input needed.
 
 Use this goal sentence:
 
@@ -81,9 +85,9 @@ Use this goal sentence:
 
 For `goal`, return exactly these sections (unless the user requests another format):
 
-1. **🎯 생성된 Codex /goal 프롬프트** — one copyable `/goal` line.
+1. **🎯 생성된 Codex·Claude /goal 프롬프트** — one copyable `/goal` line usable in either supported environment.
 2. **📋 왜 이 프롬프트가 강력한가?** — the six elements, compactly mapped.
-3. **💡 사용 팁** — only material, verified operational advice. Do not invent unsupported `/goal` subcommands.
+3. **💡 사용 팁** — only material, verified platform-specific operational advice. Do not invent unsupported commands or subcommands.
 
 If the user says “더 세밀하게,” regenerate with more specific verification commands, allowed paths/tools, invariants, retry evidence, and blocked-report fields—not more generic prose.
 
@@ -115,8 +119,8 @@ Return these sections, omitting inapplicable ones:
 
 For `goal`, additionally include exact verification commands/results, changed files, remaining risks, and confidence in the final report.
 
-For `structured`, output a schema instead of asking for “JSON only.” For `eval`, revise against the supplied failures and preserve a before/after comparison.
+For `structured`, output a schema instead of asking for “JSON only.” Define field types, required and allowed values, missing or invalid input behavior, and business-rule checks. For `code`, request runnable examples or tests. For `eval`, revise against supplied failures, audit evidence and uncertainty, identify human-review gates, and preserve a before/after comparison.
 
 ## Quality gate
 
-Before delivering, check that the prompt has a concrete objective, no duplicated rules, no invented tools or permissions, an output contract, and a verification or honest limitation. Keep casual prompts short; add orchestration only for actual multi-step work.
+Before delivering, check that the prompt has a concrete objective, no duplicated rules, no invented tools or permissions, an output contract, and a verification or honest limitation. When claims or decisions matter, check evidence, uncertainty, assumptions, and human-review gates. Keep casual prompts short; add orchestration only for actual multi-step work.

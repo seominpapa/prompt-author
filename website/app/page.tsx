@@ -2,15 +2,15 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 
-type Mode = "casual" | "research" | "structured" | "coding" | "tool" | "image" | "video" | "presentation" | "goal";
+type Mode = "casual" | "research" | "structured" | "code" | "coding" | "tool" | "image" | "video" | "presentation" | "goal" | "eval";
 
 const modes: Record<Mode, { label: string; short: string; rule: string; example: string; fields: string[]; values: [string, string, string] }> = {
   casual: {
-    label: "캐주얼",
+    label: "일반 대화·초안",
     short: "대화 · 초안 · 아이디어",
-    rule: "목표·대상·결과 형식을 짧고 선명하게 씁니다. 빠진 정보가 결과를 크게 바꾸면 질문하고, 아니면 안전한 가정을 둡니다.",
-    example: "당신은 고객 커뮤니케이션 담당자입니다. 기존 고객에게 서비스 이용에 감사하는 친근한 이메일을 150자 내외로 작성하세요. 제목 1개와 본문을 반환하세요.",
-    fields: ["목표", "대상", "결과 형식"],
+    rule: "목표·대상·결과 형식을 짧게 씁니다. 중요한 사실이나 판단이 있으면 근거를 확인하고, 확인된 사실·불확실한 내용·가정을 구분하며, 사람의 최종 확인이 필요한 부분을 표시합니다.",
+    example: "기존 고객에게 서비스 이용에 감사하는 친근한 이메일을 150자 내외로 작성하세요. 사실 판단이 필요한 내용은 근거와 불확실성을 구분하고, 사람의 최종 확인이 필요한 부분을 표시하세요. 제목 1개와 본문을 반환하세요.",
+    fields: ["작성 목표", "대상·말투", "분량·결과 형식"],
     values: ["고객에게 감사 이메일 작성", "기존 고객, 친근한 톤", "제목 1개와 150자 내외 본문"],
   },
   research: {
@@ -22,28 +22,36 @@ const modes: Record<Mode, { label: string; short: string; rule: string; example:
     values: ["2026년 한국 생성형 AI 시장 조사", "정부·기업 공식 자료를 우선", "출처를 포함한 사실·해석 구분 표"],
   },
   structured: {
-    label: "구조화",
+    label: "JSON 등 구조화된 출력",
     short: "JSON · API 응답",
-    rule: "자연어 대신 스키마를 계약으로 씁니다. 필수 입력이 없을 때의 상태와 오류 응답도 정합니다.",
-    example: "아래 고객 문의를 분류하세요. status, category, urgency, reason 필드를 가진 JSON 스키마로 반환하세요. 정보가 부족하면 status를 needs_input으로 설정하세요.",
-    fields: ["작업", "스키마", "누락 입력 처리"],
-    values: ["고객 문의 분류", "status·category·urgency·reason JSON 스키마", "정보 부족 시 status를 needs_input으로 설정"],
+    rule: "프로그램이 바로 처리할 수 있도록 필드명·자료형·필수값·허용값·중첩 구조를 스키마로 정하고, 누락·오류 처리와 비즈니스 규칙 검증까지 지정합니다.",
+    example: "고객 문의를 분류하세요. status, category, urgency, reason의 자료형·필수값·허용값을 정의한 JSON 스키마로 반환하고, 정보가 부족하면 status를 needs_input으로 설정해 누락 필드를 설명하세요.",
+    fields: ["처리할 작업", "필드·자료형·허용값", "누락·오류 처리"],
+    values: ["고객 문의 분류", "status·category·urgency·reason의 자료형·필수값·허용값", "정보 부족 시 needs_input과 누락 필드 반환"],
+  },
+  code: {
+    label: "코드 작성·설명",
+    short: "함수 · 리뷰 · 원인 설명",
+    rule: "언어와 실행 환경, 입력·출력, 예외 상황, 성능·보안 제약을 먼저 정하고 실행 가능한 예제나 테스트로 확인하도록 요구합니다.",
+    example: "TypeScript로 이메일 형식을 검증하는 함수를 작성하세요. 빈 값과 잘못된 도메인을 처리하고, 입력·출력 예시와 node:test 테스트를 함께 제공하세요.",
+    fields: ["작성·설명할 코드", "언어·실행 환경", "입출력·테스트"],
+    values: ["이메일 형식 검증 함수 작성", "TypeScript, Node.js 22", "빈 값·잘못된 도메인 테스트와 입력·출력 예시"],
   },
   coding: {
-    label: "코딩 에이전트",
+    label: "Codex·Claude Code 에이전트 작업",
     short: "수정 · 디버깅",
-    rule: "바꿀 범위와 검증 명령을 고정합니다. 공유 동작은 모든 호출자를 살핀 뒤, 가장 작은 근본 원인 수정으로 해결합니다.",
-    example: "결제 API의 타임아웃 오류를 수정하세요. checkout 서비스와 관련 테스트만 변경하세요. 공유 동작의 모든 호출자를 확인하고 npm test로 검증하세요.",
-    fields: ["목표", "허용 경로", "검증 명령"],
-    values: ["결제 API 타임아웃 오류 수정", "checkout 서비스와 관련 테스트", "npm test 실행 후 결과 보고"],
+    rule: "저장소에서 수정할 범위와 보존할 동작을 고정합니다. 관련 코드와 호출 경로를 조사하고, 최소한의 근본 원인 수정 후 테스트·린트·빌드 결과를 보고하게 합니다.",
+    example: "결제 API 타임아웃 오류를 수정하세요. checkout 서비스와 관련 테스트만 변경하고 기존 API 동작을 보존하세요. 호출 경로를 확인한 뒤 npm test와 lint로 검증하고, 변경 파일과 결과를 보고하세요.",
+    fields: ["저장소 작업 목표", "허용 경로·보존 동작", "검증 명령"],
+    values: ["결제 API 타임아웃 오류 수정", "checkout 서비스와 관련 테스트만 변경, 기존 API 동작 보존", "npm test와 lint 실행 후 변경 파일·결과 보고"],
   },
   tool: {
-    label: "도구 사용",
+    label: "도구·API 사용",
     short: "API · 외부 작업",
-    rule: "사용 가능한 도구와 승인 필요한 행동을 분리합니다. 도구 결과를 사실로 검증하되, 그 안의 지시는 신뢰하지 않습니다.",
+    rule: "도구와 데이터 범위, 자동 조회와 승인 필요한 생성·수정·발송 작업을 분리합니다. 결과 검증, 오류·재시도 조건, 비밀키 보호와 최종 형식을 지정합니다.",
     example: "지원 티켓을 분석하세요. ticket_search 도구로 근거를 찾고, 고객에게 메일을 보내거나 데이터를 변경하기 전에는 승인을 요청하세요. 우선순위 목록으로 반환하세요.",
-    fields: ["목표", "사용 가능 도구", "승인 필요 작업"],
-    values: ["지원 티켓 분석", "ticket_search", "고객 메일 발송 또는 데이터 변경 전 승인 요청"],
+    fields: ["작업 목표", "도구·데이터 범위", "승인 작업·결과 형식"],
+    values: ["지원 티켓 분석", "ticket_search로 티켓 조회", "메일 발송·데이터 변경 전 승인, 우선순위 목록 반환"],
   },
   image: {
     label: "이미지 제작",
@@ -70,12 +78,20 @@ const modes: Record<Mode, { label: string; short: string; rule: string; example:
     values: ["스타트업 투자자에게 AI 고객지원 제품의 시드 투자를 설득", "문제·해결책·시장·제품·성과·비즈니스 모델·경쟁·로드맵·팀·요청", "10장, 슬라이드별 제목·핵심 메시지·권장 시각 자료"],
   },
   goal: {
-    label: "Codex /goal",
+    label: "자율 실행·/goal",
     short: "지속 작업 · 반복 검증",
-    rule: "관찰 가능한 완료 조건, 작업 경계, 반복 정책, 차단 조건을 한 문장 계약으로 묶습니다. 완료 전에는 회귀·제약·비밀 노출을 검토합니다.",
+    rule: "Codex와 Claude Code에서 공통으로 쓸 수 있도록 관찰 가능한 완료 조건, 작업 경계, 반복 정책, 차단 조건을 한 문장 계약으로 묶습니다. Claude Code에서는 한 세션에 목표 하나만 활성화되며 조건은 4,000자 이내여야 합니다.",
     example: "/goal 결제 API p95를 150ms 미만으로 낮추고, 공식 부하 테스트 5회와 전체 테스트 통과로 검증하세요. checkout 서비스와 관련 테스트만 사용하고, 실패 시 전략을 바꾸세요.",
     fields: ["완료 조건", "검증 방법", "허용 범위"],
     values: ["결제 API p95를 150ms 미만으로 낮추기", "공식 부하 테스트 5회와 전체 테스트 통과", "checkout 서비스와 관련 테스트만 사용"],
+  },
+  eval: {
+    label: "기존 프롬프트 개선",
+    short: "실패 분석 · 회귀 검증",
+    rule: "기존 프롬프트와 실제·기대 결과를 비교합니다. 근거 없는 주장, 사실·추론 혼합, 불확실성 누락, 사람 확인이 필요한 판단을 점검하고 한 번에 한 원인만 수정합니다.",
+    example: "아래 고객 답변 프롬프트를 개선하세요. 실제 답변에서 출처 없는 수치와 확정적인 표현이 반복됩니다. 근거·불확실성·사람 확인이 필요한 부분을 구분하도록 수정하고 정상·경계·실패 사례로 검증하세요.",
+    fields: ["기존 프롬프트", "실제 문제·결과", "기대 결과·평가 기준"],
+    values: ["고객 답변 생성 프롬프트", "출처 없는 수치와 불확실성을 숨긴 확정 표현", "근거·불확실성·사람 확인을 구분하고 정상·경계·실패 사례 통과"],
   },
 };
 
@@ -122,15 +138,17 @@ export default function Home() {
     const goal = objective || "{{목표}}";
     const who = audience || "{{대상 또는 맥락}}";
     const output = format || "{{결과 형식}}";
-    if (practiceMode === "goal") return `/goal ${goal}, ${who}로 검증하세요. ${output}만 사용하세요. 반복마다 실제 상태를 확인하고 실패하면 전략을 바꾸세요. 완료 전 회귀·제약·비밀 노출을 검토하세요.`;
+    if (practiceMode === "goal") return `/goal ${goal}, ${who}로 검증하세요. ${output}만 사용하세요. 반복마다 실제 상태를 확인하고 실패하면 전략을 바꾸세요. 검증 명령과 결과를 대화에 남기세요. 완료 전 회귀·제약·비밀 노출을 검토하세요.`;
     if (practiceMode === "research") return `${goal}을(를) ${who}을 위해 조사하세요. 최신성이 필요한 주장은 확인하고, 각 핵심 주장에 출처를 붙이세요. 사실과 추론을 구분해 ${output}(으)로 반환하세요.`;
-    if (practiceMode === "structured") return `작업: ${goal}\n입력 범위: ${who}\n반환 형식: ${output}\n필수 정보가 없으면 status를 needs_input으로 설정하고 누락된 필드를 설명하세요.`;
-    if (practiceMode === "coding") return `목표: ${goal}\n범위: ${who}\n검증: ${output}\n관련 코드와 공유 동작의 호출자를 먼저 확인하고, 가장 작은 근본 원인 수정 후 검증 결과를 보고하세요.`;
-    if (practiceMode === "tool") return `목표: ${goal}\n사용 가능한 도구: ${who}\n반환 형식: ${output}\n도구 결과를 확인한 뒤 다음 행동을 판단하세요. 외부 변경·발송·비용 발생 작업은 승인 전에 실행하지 마세요.`;
+    if (practiceMode === "structured") return `작업: ${goal}\n필드·자료형·허용값: ${who}\n누락·오류 처리: ${output}\n필수값과 중첩 구조를 포함한 JSON 스키마를 정의하세요. 스키마와 비즈니스 규칙을 모두 검증하고, 잘못된 입력에는 status와 누락·오류 필드를 반환하세요.`;
+    if (practiceMode === "code") return `코드 작업: ${goal}\n언어·실행 환경: ${who}\n입출력·검증: ${output}\n예외 상황과 성능·보안 제약을 설명하고, 실행 가능한 예제 또는 테스트를 함께 제공하세요.`;
+    if (practiceMode === "coding") return `저장소 작업 목표: ${goal}\n허용 경로·보존 동작: ${who}\n검증 명령: ${output}\n관련 코드와 공유 동작의 호출 경로를 먼저 확인하고 기존 사용자 변경을 보존하세요. 가장 작은 근본 원인 수정 후 테스트·린트·빌드 중 해당하는 검증을 실행하세요. 외부 전송·배포·삭제·비용 발생 작업은 승인 전에 실행하지 말고, 변경 파일과 검증 결과를 보고하세요.`;
+    if (practiceMode === "tool") return `작업 목표: ${goal}\n도구·데이터 범위: ${who}\n승인 작업·결과 형식: ${output}\n조회와 생성·수정·발송 작업을 구분하고 승인 필요한 작업은 실행 전에 확인하세요. 도구 결과를 검증하고, 오류 시 같은 작업을 그대로 반복하지 마세요. 비밀키를 노출하지 마세요.`;
+    if (practiceMode === "eval") return `기존 프롬프트:\n${goal}\n\n실제 문제·결과: ${who}\n기대 결과·평가 기준: ${output}\n근거 없는 주장, 사실과 추론의 혼합, 불확실성 누락, 사람의 최종 확인이 필요한 부분을 점검하세요. 실패 원인을 한 번에 하나씩 수정하고 정상·경계·실패·회귀 사례로 검증하세요. 수정된 프롬프트와 변경 이유, 평가 결과, 남은 한계를 반환하세요.`;
     if (practiceMode === "image") return `이미지를 생성하세요.\n주제·피사체: ${goal}\n시각 스타일·구도: ${who}\n비율·제약: ${output}${referencePrompt ? `\n\n아래 레퍼런스 프롬프트의 분위기·구도·디테일을 참고하되, 피사체와 요청 조건에 맞게 새로 작성하세요.\n레퍼런스:\n${referencePrompt}` : ""}`;
     if (practiceMode === "video") return `영상을 생성하세요.\n장면·행동: ${goal}\n촬영·연출: ${who}\n길이·형식: ${output}${referencePrompt ? `\n\n아래 레퍼런스 프롬프트의 연출·카메라·리듬을 참고하되, 요청 조건에 맞게 새로 작성하세요.\n레퍼런스:\n${referencePrompt}` : ""}`;
     if (practiceMode === "presentation") return `프레젠테이션을 제작하세요.\n발표 목표·청중: ${goal}\n핵심 메시지·구성: ${who}\n분량·결과 형식: ${output}\n각 슬라이드에 제목, 한 줄 핵심 메시지, 본문 요점, 권장 시각 자료를 제시하세요.${designBrief ? `\n\n다음 design.md의 디자인 설명을 발표 자료의 색상·타이포그래피·간격·컴포넌트·톤에 반영하세요:\n${designBrief}` : ""}`;
-    return `당신은 ${who}을 돕습니다.\n작업: ${goal}\n반환 형식: ${output}\n필요한 정보가 결과를 크게 바꾸면 짧게 질문하고, 그렇지 않으면 가정을 밝힌 뒤 작성하세요.`;
+    return `당신은 ${who}을 돕습니다.\n작업: ${goal}\n반환 형식: ${output}\n필요한 정보가 결과를 크게 바꾸면 짧게 질문하고, 그렇지 않으면 가정을 밝힌 뒤 작성하세요. 중요한 사실이나 판단이 포함되면 근거를 확인하고, 확인된 사실·불확실한 내용·가정을 구분하세요. 법률·의료·재무 판단이나 외부 실행처럼 사람의 최종 확인이 필요한 부분을 표시하세요.`;
   }, [practiceMode, objective, audience, format, referencePrompt, designBrief]);
 
   async function copyPrompt() {
@@ -193,8 +211,8 @@ export default function Home() {
       <section className="paths section" id="paths">
         <div className="paths-heading"><p className="section-kicker">01 / CHOOSE YOUR PATH</p><h2>원하는 방식으로<br /><em>바로 시작</em>하세요.</h2><p>반복해서 프롬프트를 만들면 스킬을 설치하고, 지금 한 번의 프롬프트가 필요하면 웹에서 바로 생성하세요.</p></div>
         <div className="path-cards">
-          <article className="path-card skill-path"><p className="mono">PATH 01</p><span className="path-number">01</span><h3>스킬을 내려받아<br />Codex에서 사용하기</h3><p>저장소를 설치하면 매 작업에서 <code>$prompt-author</code>로 상황에 맞는 프롬프트를 요청할 수 있습니다.</p><a href="https://github.com/seominpapa/prompt-author#설치-방법" target="_blank" rel="noreferrer">스킬 설치 방법 보기 <span>↗</span></a></article>
-          <article className="path-card web-path"><p className="mono">PATH 02</p><span className="path-number">02</span><h3>웹에서 만들고<br />바로 붙여넣기</h3><p>조건을 입력해 프롬프트를 생성한 뒤 <strong>복사하기</strong>를 누르고, ChatGPT·Codex 등 원하는 곳에 붙여넣으세요.</p><a href="#workbench">웹에서 프롬프트 만들기 <span>→</span></a></article>
+          <article className="path-card skill-path"><p className="mono">PATH 01</p><span className="path-number">01</span><h3>스킬을 내려받아<br />Codex·Claude Code에서 사용하기</h3><p>저장소를 설치한 뒤 Codex에서는 <code>$prompt-author</code>, Claude Code에서는 <code>/prompt-author</code>로 상황에 맞는 프롬프트를 요청할 수 있습니다.</p><a href="https://github.com/seominpapa/prompt-author#설치-방법" target="_blank" rel="noreferrer">스킬 설치 방법 보기 <span>↗</span></a></article>
+          <article className="path-card web-path"><p className="mono">PATH 02</p><span className="path-number">02</span><h3>웹에서 만들고<br />바로 붙여넣기</h3><p>조건을 입력해 프롬프트를 생성한 뒤 <strong>복사하기</strong>를 누르고, ChatGPT·Codex·Claude 등 원하는 곳에 붙여넣으세요.</p><a href="#workbench">웹에서 프롬프트 만들기 <span>→</span></a></article>
         </div>
       </section>
 
@@ -208,7 +226,7 @@ export default function Home() {
         <div className="mode-header"><p className="section-kicker">03 / MODE SELECTOR</p><p>상황을 선택해 원칙과 예시를 확인하세요.</p></div>
         <div className="mode-layout">
           <div className="mode-list" role="tablist" aria-label="프롬프트 상황">
-            {(Object.keys(modes) as Mode[]).map((key, i) => <button type="button" key={key} className={guideMode === key ? "active" : ""} onClick={() => setGuideMode(key)} role="tab" aria-selected={guideMode === key}><span>0{i + 1}</span><strong>{modes[key].label}</strong><small>{modes[key].short}</small><i>↗</i></button>)}
+            {(Object.keys(modes) as Mode[]).map((key, i) => <button type="button" key={key} className={guideMode === key ? "active" : ""} onClick={() => setGuideMode(key)} role="tab" aria-selected={guideMode === key}><span>{String(i + 1).padStart(2, "0")}</span><strong>{modes[key].label}</strong><small>{modes[key].short}</small><i>↗</i></button>)}
           </div>
           <article className="mode-detail">
             <p className="detail-tag">{selected.label.toUpperCase()} MODE</p>
@@ -228,7 +246,7 @@ export default function Home() {
       </section>
 
       <section className="practice section" id="practice">
-        <div className="practice-heading"><p className="section-kicker">05 / TRY IT YOURSELF</p><h2>이제, 당신의<br /><em>조건을 넣어보세요.</em></h2><p>입력값이 비어 있으면 변수로 남습니다. 생성된 프롬프트는 <strong>복사하기</strong>를 눌러 ChatGPT·Codex 등 원하는 도구에 바로 붙여 넣을 수 있습니다.</p></div>
+        <div className="practice-heading"><p className="section-kicker">05 / TRY IT YOURSELF</p><h2>이제, 당신의<br /><em>조건을 넣어보세요.</em></h2><p>입력값이 비어 있으면 변수로 남습니다. 생성된 프롬프트는 <strong>복사하기</strong>를 눌러 ChatGPT·Codex·Claude 등 원하는 도구에 바로 붙여 넣을 수 있습니다.</p></div>
         <div className="workbench" id="workbench">
           <div className="form-panel">
             <div className="mode-choices" role="group" aria-label="상황">{(Object.keys(modes) as Mode[]).map((key) => <button type="button" key={key} className={practiceMode === key ? "active" : ""} onClick={() => selectPracticeMode(key)}>{modes[key].label}</button>)}</div>
@@ -239,7 +257,7 @@ export default function Home() {
             {practiceMode === "presentation" && <><p className="reference-help"><a href="https://getdesign.md/" target="_blank" rel="noreferrer">getdesign.md</a>에서 디자인 기준을 찾거나, 가진 design.md 파일을 선택하세요. 내용은 이 브라우저에서만 읽습니다.</p><label>design.md 업로드<input type="file" accept=".md,text/markdown,text/plain" onChange={(e) => readDesignFile(e.target.files?.[0])} /></label>{designBrief && <p className="file-status">design.md 디자인 설명을 프롬프트에 반영합니다.</p>}</>}
             <button className="ghost" onClick={loadExample}>예시 조건 채우기 <span>↗</span></button>
           </div>
-          <div className="output-panel"><div className="output-top"><span className="mono">YOUR PROMPT</span><button onClick={copyPrompt}>{copied ? "복사됨!" : "복사하기"}</button></div><pre>{practicePrompt}</pre><p className="output-note">{objective && audience && format ? "조건이 모두 채워졌습니다. 이 프롬프트를 사용해 보세요." : "빈 조건은 {{변수}}로 남겨 두었습니다."}</p></div>
+          <div className="output-panel"><div className="output-top"><span className="mono">YOUR PROMPT</span><button onClick={copyPrompt}>{copied ? "복사됨!" : "복사하기"}</button></div><pre>{practicePrompt}</pre><p className="output-note">{practiceMode === "goal" && practicePrompt.length > 4000 ? "Claude Code의 /goal 조건은 4,000자 이내로 줄여야 합니다." : objective && audience && format ? "조건이 모두 채워졌습니다. 이 프롬프트를 사용해 보세요." : "빈 조건은 {{변수}}로 남겨 두었습니다."}</p></div>
         </div>
       </section>
 
