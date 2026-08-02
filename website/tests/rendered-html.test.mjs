@@ -25,7 +25,7 @@ test("server-renders the Prompt Author learning page", async () => {
   assert.match(html, /상황별 프롬프트 제공 방식|MODE SELECTOR/);
   assert.match(html, /TRY IT YOURSELF/);
   assert.match(html, /YOUR PROMPT/);
-  assert.match(html, /자율 실행·\/goal/);
+  assert.match(html, /지속 작업·\/goal/);
   assert.match(html, /Codex·Claude Code에서 사용하기/);
   assert.match(html, /ChatGPT·Codex·Claude/);
   assert.match(html, /일반 대화·초안/);
@@ -51,12 +51,12 @@ test("ships the interactive practice tool without starter preview code", async (
   assert.match(page, /setObjective\(practiceSelected\.values\[0\]\)/);
   assert.match(page, /일반 대화·초안/);
   assert.match(page, /PPT 제작/);
-  assert.match(page, /자율 실행·\/goal/);
+  assert.match(page, /지속 작업·\/goal/);
   assert.match(page, /Codex·Claude Code에서 사용하기/);
   assert.match(page, /Codex에서는 <code>\$prompt-author<\/code>/);
   assert.match(page, /Claude Code에서는 <code>\/prompt-author<\/code>/);
   assert.match(page, /ChatGPT·Codex·Claude/);
-  assert.match(page, /검증 명령과 결과를 대화에 남기세요/);
+  assert.match(page, /완료 확인 기준과 결과를 대화에 남기세요/);
   assert.match(page, /const \[needsVerification, setNeedsVerification\] = useState\(false\)/);
   assert.match(page, /근거·불확실성 검증 포함/);
   assert.match(page, /needsVerification \?/);
@@ -78,6 +78,7 @@ test("ships the interactive practice tool without starter preview code", async (
   assert.match(page, /권한 설정은 별도로 확인/);
   assert.match(page, /최대 턴수나 시간 한도/);
   assert.match(page, /Codex objective와 Claude Code condition은 4,000자 제한/);
+  assert.doesNotMatch(page, /결제 API|checkout|검증 명령/);
   assert.match(page, /대표 사례·경계 사례·실패 사례와 기대 결과/);
   assert.doesNotMatch(page, /label: "JSON 등 구조화된 출력"|label: "코드 작성·설명"|label: "Codex·Claude Code 에이전트 작업"|label: "도구·API 사용"/);
   assert.doesNotMatch(page, /Codex에서 사용하기/);

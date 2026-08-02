@@ -20,7 +20,7 @@ Classify the request before writing. Ask at most three questions only when the a
 | `presentation` | slide decks and PPT outlines | audience and goal, narrative and slide count, delivery format, optional design brief |
 | `app-start` | preparing an app idea for a specialist development skill | app purpose, target users and devices, core features, constraints, desired first deliverable |
 | `automation-start` | preparing a repeated workflow for a specialist automation skill | current workflow, trigger and inputs, desired result, exceptions, human approval points |
-| `goal` | Codex or Claude Code Goal (`/goal`) for durable work | one durable objective, completion test, blocked condition, optional platform-specific budget |
+| `goal` | Codex or Claude Code Goal (`/goal`) for durable work | one durable objective, completion check, unresolved stop condition, optional platform-specific budget |
 | `eval` | improving an existing prompt | prompt, observed failures, expected result, evidence and uncertainty gaps, success rubric, representative cases |
 
 For a provider- or model-specific request, consult its current official prompting documentation before prescribing model parameters or API features. Do not hardcode transient model behavior.
@@ -81,7 +81,7 @@ Use `goal` as an optional persistent-work extension of the same prompt-author wo
 Use this goal sentence:
 
 ```markdown
-/goal {{outcome}}, verified by {{verification_surface}}, while preserving {{constraints}}. Use only {{boundaries}}. Between iterations, {{iteration_policy}}. Stop after {{max_turns_or_time}} if unresolved. For security-sensitive, high-stakes, deployment, destructive, or broad-regression work, review regressions, constraint violations, and secret exposure before completion. If no valid in-scope path remains, stop and report attempted paths, evidence, blocker, and exact input needed. Final report: changed files, exact verification commands and results, remaining risks, confidence.
+/goal {{outcome}}, verified by {{verification_surface}}, while preserving {{constraints}}. Use only {{boundaries}}. Between iterations, {{iteration_policy}}. Stop after {{max_turns_or_time}} if unresolved. For security-sensitive, high-stakes, deployment, destructive, or broad-regression work, review regressions, constraint violations, and secret exposure before completion. If no valid in-scope path remains, stop and report attempted paths, evidence, blocker, and exact input needed. Final report: completed work, verification evidence and results, remaining risks, confidence.
 ```
 
 For `goal`, return exactly these sections (unless the user requests another format):
@@ -90,7 +90,7 @@ For `goal`, return exactly these sections (unless the user requests another form
 2. **📋 왜 이 프롬프트가 강력한가?** — the six elements, compactly mapped.
 3. **💡 사용 팁** — only material, verified platform-specific operational advice. Do not invent unsupported commands or subcommands.
 
-If the user says “더 세밀하게,” regenerate with more specific verification commands, allowed paths/tools, invariants, retry evidence, and blocked-report fields—not more generic prose.
+If the user says “더 세밀하게,” regenerate with more specific completion checks, allowed scope, invariants, retry evidence, and blocked-report fields—not more generic prose.
 
 ## Specialist handoff rules
 
@@ -114,7 +114,7 @@ Return these sections, omitting inapplicable ones:
 4. **Evaluation cases** — representative success, edge, and failure cases.
 5. **Handoff notes** — receiving specialist, required assets, open decisions, and approval points when applicable.
 
-For `goal`, additionally include exact verification commands/results, changed files, remaining risks, and confidence in the final report.
+For `goal`, additionally include completed work, verification evidence/results, remaining risks, and confidence in the final report.
 
 If the user requests JSON, CSV, a table, or another format, preserve it as the output format without turning it into a separate Prompt Author mode or designing provider-specific schemas. For `eval`, revise against supplied failures, audit evidence and uncertainty, identify human-review gates, and preserve a before/after comparison using representative, edge, failure, and regression cases with explicit expected behavior. Prefer exact or rule-based checks, then human review; use LLM graders only after validating them against human judgments.
 

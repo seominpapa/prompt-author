@@ -112,7 +112,7 @@ Require explicit human approval before sending messages, publishing, purchasing,
 Use this extension only for durable, multi-turn work. Keep the other mode's task-specific structure where relevant: preserve source and citation rules for research, milestones and acceptance criteria for app-development handoff, or triggers, approvals, exceptions, and ownership for automation handoff. A core `/goal` contract can be written portably, but lifecycle and permissions remain platform-specific. `/goal` does not grant extra permissions or approval to mutate external systems. Codex documents a 4,000-character objective limit and Claude Code documents a 4,000-character goal condition limit; verify current target documentation before relying on lifecycle controls. Mention a separate budget only when the target runtime documents it and the user explicitly requests it. In Claude Code, one goal can be active per session, a new goal replaces it, and verification evidence must appear in the conversation for the evaluator to assess it. `blocked` is a Prompt Author reporting convention, not an official lifecycle state. Add a maximum turn or time bound for open-ended goals.
 
 ```markdown
-/goal {{outcome}}, verified by {{exact_test_benchmark_or_artifact}}, while preserving {{non_negotiable_constraints}}. Use only {{allowed_paths_tools_and_scope}}. Between iterations, inspect live state, record before/after evidence, and change strategy after a failed check. Stop after {{max_turns_or_time}} if unresolved. For security-sensitive, high-stakes, deployment, destructive, or broad-regression work, review regressions, constraint violations, and secret exposure before completion. If no valid in-scope path remains, stop and report attempted paths, evidence, blocker, and exact input needed. Final report: changed files, exact verification commands and results, remaining risks, confidence.
+/goal {{outcome}}, verified by {{completion_check_or_artifact}}, while preserving {{non_negotiable_constraints}}. Use only {{allowed_scope}}. Between iterations, inspect live state, record before/after evidence, and change strategy after a failed check. Stop after {{max_turns_or_time}} if unresolved. For security-sensitive, high-stakes, deployment, destructive, or broad-regression work, review regressions, constraint violations, and secret exposure before completion. If no valid in-scope path remains, stop and report attempted paths, evidence, blocker, and exact input needed. Final report: completed work, verification evidence and results, remaining risks, confidence.
 ```
 
 Good:
@@ -124,7 +124,7 @@ Good:
 Avoid:
 
 ```markdown
-/goal Research every option, write code, publish it, and keep improving forever.
+/goal Research every option, publish everything, and keep improving forever.
 ```
 
 ## Prompt evaluation and improvement
