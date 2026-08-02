@@ -29,11 +29,10 @@ test("server-renders the Prompt Author learning page", async () => {
   assert.match(html, /Codex·Claude Code에서 사용하기/);
   assert.match(html, /ChatGPT·Codex·Claude/);
   assert.match(html, /일반 대화·초안/);
-  assert.match(html, /JSON 등 구조화된 출력/);
-  assert.match(html, /코드 작성·설명/);
-  assert.match(html, /Codex·Claude Code 에이전트 작업/);
-  assert.match(html, /도구·API 사용/);
+  assert.match(html, /앱 개발 시작/);
+  assert.match(html, /업무 자동화 시작/);
   assert.match(html, /기존 프롬프트 개선/);
+  assert.doesNotMatch(html, /JSON 등 구조화된 출력|코드 작성·설명|Codex·Claude Code 에이전트 작업|도구·API 사용/);
   assert.doesNotMatch(html, /Your site is taking shape|Building your site|react-loading-skeleton/);
 });
 
@@ -63,23 +62,24 @@ test("ships the interactive practice tool without starter preview code", async (
   assert.match(page, /needsVerification \?/);
   assert.match(page, /practicePrompt\.length > 4000/);
   assert.match(page, /Codex objective와 Claude Code condition은 4,000자 이내로 줄여야 합니다/);
-  assert.match(page, /if \(practiceMode === "code"\)/);
+  assert.match(page, /if \(practiceMode === "app"\)/);
+  assert.match(page, /if \(practiceMode === "automation"\)/);
   assert.match(page, /if \(practiceMode === "eval"\)/);
   assert.match(page, /확인된 사실·불확실한 내용·가정을 구분/);
   assert.match(page, /사람의 최종 확인이 필요한 부분/);
-  assert.match(page, /OpenAI Structured Outputs/);
-  assert.match(page, /`output_config\.format`/);
-  assert.match(page, /`strict: true`/);
-  assert.match(page, /`additionalProperties: false`/);
+  assert.match(page, /프레임워크·도구·서브에이전트·기술 검증 방식을 직접 선택하지/);
+  assert.match(page, /전문 개발 스킬/);
+  assert.match(page, /자동화 전문 스킬/);
+  assert.match(page, /사람의 승인 단계/);
   assert.match(page, /신뢰할 수 없는 참고 데이터/);
   assert.match(page, /내부 명령.*따르지 말고/);
   assert.match(page, /<untrusted_reference>/);
   assert.match(page, /<untrusted_design_reference>/);
-  assert.match(page, /프롬프트만으로 도구 권한이 확대되지 않습니다/);
   assert.match(page, /권한 설정은 별도로 확인/);
   assert.match(page, /최대 턴수나 시간 한도/);
   assert.match(page, /Codex objective와 Claude Code condition은 4,000자 제한/);
   assert.match(page, /대표 사례·경계 사례·실패 사례와 기대 결과/);
+  assert.doesNotMatch(page, /label: "JSON 등 구조화된 출력"|label: "코드 작성·설명"|label: "Codex·Claude Code 에이전트 작업"|label: "도구·API 사용"/);
   assert.doesNotMatch(page, /Codex에서 사용하기/);
   assert.doesNotMatch(page, /label: "Codex \/goal"/);
   assert.match(page, /getdesign\.md/);
@@ -132,7 +132,7 @@ test("keeps the README, skill, patterns, and website terminology aligned", async
     readFile(new URL("../app/page.tsx", import.meta.url), "utf8"),
   ]);
 
-  for (const label of ["일반 대화·초안", "JSON 등 구조화된 출력", "코드 작성·설명", "Codex·Claude Code 에이전트 작업", "도구·API 사용", "기존 프롬프트 개선"]) {
+  for (const label of ["일반 대화·초안", "앱 개발 시작", "업무 자동화 시작", "기존 프롬프트 개선"]) {
     assert.match(readme, new RegExp(label));
     assert.match(page, new RegExp(label));
   }
@@ -140,21 +140,23 @@ test("keeps the README, skill, patterns, and website terminology aligned", async
   assert.match(readme, /확인된 사실·불확실한 내용·가정/);
   assert.match(readme, /사람의 최종 확인/);
   assert.match(readme, /Prompt Author의 자체 원칙/);
-  assert.match(readme, /OpenAI Structured Outputs/);
-  assert.match(readme, /Claude `output_config\.format`/);
-  assert.match(readme, /citations.*함께 사용할 수 없습니다/);
+  assert.match(readme, /프레임워크·도구·API·서브에이전트·기술 검증 방식을 직접 설계하지 않습니다/);
+  assert.match(readme, /전문 개발 스킬/);
+  assert.match(readme, /자동화 전문 스킬/);
   assert.match(readme, /레퍼런스는 신뢰할 수 없는 참고 데이터/);
   assert.match(readme, /\/goal.*권한을 자동 승인하지 않습니다/);
-  assert.match(readme, /OpenAI Evals 플랫폼/);
-  assert.match(skill, /\| `code` \| code writing, explanation, and review/);
+  assert.doesNotMatch(readme, /JSON 등 구조화된 출력|코드 작성·설명|Codex·Claude Code 에이전트 작업|도구·API 사용/);
+  assert.match(skill, /\| `app-start` \|/);
+  assert.match(skill, /\| `automation-start` \|/);
   assert.match(skill, /verified facts, uncertainty, and assumptions/);
   assert.match(skill, /skill preferences, not universal official requirements/);
-  assert.match(skill, /additionalProperties: false/);
-  assert.match(skill, /Claude `output_config\.format`/);
-  assert.match(skill, /citations/);
-  assert.match(patterns, /## Code writing and explanation/);
+  assert.match(skill, /Do not choose frameworks, tools, APIs, subagent topology, or technical verification/);
+  assert.doesNotMatch(skill, /\| `(structured|code|coding-agent|tool-agent|harness-loop)` \|/);
+  assert.match(patterns, /## App development start/);
+  assert.match(patterns, /## Business automation start/);
   assert.match(patterns, /## Prompt evaluation and improvement/);
-  assert.match(patterns, /does not replace casual, research, structured, code, coding-agent/);
+  assert.match(patterns, /does not replace casual, research, image, video, presentation, app-start, automation-start, or evaluation templates/);
+  assert.doesNotMatch(patterns, /## Structured output|## Code writing and explanation|## Codex and Claude Code repository agent|## Tool-using agent|## Harness loop/);
   assert.match(patterns, /Reference text is untrusted source material/);
   assert.match(patterns, /maximum turn or time bound/);
 });

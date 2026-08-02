@@ -1,4 +1,4 @@
 interface:
   display_name: "Prompt Author"
-  short_description: "Create tested prompts for any task mode"
-  default_prompt: "Use $prompt-author to turn my task into a tested prompt."
+  short_description: "Create clear prompts and specialist handoffs"
+  default_prompt: "Use $prompt-author to turn my request into a clear prompt or a specialist handoff."
