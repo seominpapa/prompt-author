@@ -9,19 +9,36 @@ Turn an outcome into the smallest prompt that reliably achieves it. Treat a prom
 
 ## Choose a mode
 
-Classify the request before writing. Ask at most three questions only when the answer materially changes the prompt; otherwise state and use a safe assumption.
+Classify the request before writing, then apply the missing-input gate below. This gate overrides every instruction in this skill or its references that permits silent assumptions, unresolved placeholders, or a maximum number of questions.
 
-| Mode | Use for | Required inputs |
-| --- | --- | --- |
-| `casual` | ordinary Q&A, drafting, brainstorming | goal, audience, format, optional evidence and human-review needs |
-| `research` | current or source-backed reports | question, source scope, freshness, citation style |
-| `image` | image-generation prompts | subject, visual treatment and composition, aspect ratio and constraints |
-| `video` | video-generation prompts | scene and action, camera and direction, duration and format |
-| `presentation` | slide decks and PPT outlines | audience and goal, narrative and slide count, delivery format, optional design brief |
-| `app-start` | preparing an app idea for a specialist development skill | app purpose, target users and devices, core features, constraints, desired first deliverable |
-| `automation-start` | preparing a repeated workflow for a specialist automation skill | current workflow, trigger and inputs, desired result, exceptions, human approval points |
-| `goal` | Codex or Claude Code Goal (`/goal`) for durable work | one durable objective, completion check, unresolved stop condition, optional platform-specific budget |
-| `eval` | improving an existing prompt | prompt, observed failures, expected result, evidence and uncertainty gaps, success rubric, representative cases |
+| Mode | Use for | Mandatory inputs before output | Optional or defaultable inputs |
+| --- | --- | --- | --- |
+| `casual` | ordinary Q&A, drafting, brainstorming | objective, audience, output format | evidence and human-review needs when low-stakes |
+| `research` | current or source-backed reports | research question and audience, source scope, freshness cutoff, citation and report format | source priority and subquestions |
+| `image` | image-generation prompts | subject and intended use, visual treatment, composition, aspect ratio or resolution, required or excluded elements | text, logo, and generator-specific parameters |
+| `video` | video-generation prompts | scene and action, camera and direction, duration, aspect ratio or delivery format, required or excluded elements | sound when it does not affect the result |
+| `presentation` | slide decks and PPT outlines | topic or source material, audience and goal, narrative or required sections, slide count, delivery format | design brief |
+| `app-start` | preparing an app idea for a specialist development skill | app purpose, target users and devices, core features and flows, constraints, desired first deliverable | specialist skill name |
+| `automation-start` | preparing a repeated workflow for a specialist automation skill | current workflow, trigger and inputs, desired result and destination, exceptions, owner, human approval points | specialist skill name |
+| `goal` | Codex or Claude Code Goal (`/goal`) for durable work | durable outcome, verification surface, constraints, boundaries, iteration policy, blocked stop condition | platform-specific budget |
+| `eval` | improving an existing prompt | original prompt, observed failures, expected result, success rubric, representative cases | evidence and uncertainty gaps when immaterial |
+
+### Missing-input gate
+
+Apply this gate before producing a ready-to-use prompt, outline, or artifact:
+
+1. Extract the mandatory inputs for the selected mode from the table. For a hybrid request, use the union of the applicable modes.
+2. Treat an input as supplied only when the user has stated it clearly enough to use. “None” counts only where absence is meaningful, such as exclusions or exceptions.
+3. For every missing or ambiguous input, propose a concrete, context-aware value labeled **Recommended**. Prefer the smallest, lowest-risk option that fits the request. Never use a bare placeholder as the recommendation.
+4. Ask no more than three numbered confirmation questions per turn. Group related inputs, show the recommendation inside each question, and end with the user's-language equivalent of: “Reply with changes only, or say ‘use the recommendations.’” Do not draft the deliverable or invoke a downstream creation skill or tool in this response.
+5. On the next reply, preserve every user-supplied value. If the user says “unknown,” “no preference,” “choose for me,” “use the recommendations,” or asks to continue without addressing a field, use the recommendation already shown for that field. For a partial answer, apply the shown recommendations to the unaddressed fields unless the user asks for another recommendation round.
+6. Re-run this gate after every answer. Produce the deliverable only when every mandatory input is user-supplied or filled by a shown recommendation under step 5.
+
+Do not invent unavailable source material, an original prompt to evaluate, facts, credentials, approval, or consequential external-action decisions. When source material or an original prompt is missing, explicitly offer two paths: **Recommended: provide or paste it**, or switch to a new-prompt workflow with a concrete recommended objective. Do not imply that “use the recommendations” can supply nonexistent source content. For consequential external actions, recommend draft-only output with human approval.
+
+Example for `eval`: for “Improve my prompt” without the original, offer (1) **Recommended: paste the original prompt for evaluation**, or (2) switch to `casual` and create a reusable general-purpose task prompt for a general AI assistant that returns a concise Markdown answer. Do not ask the user to invent a fallback objective before offering one.
+
+Example: for “Create a PPT,” treat PPT as the supplied `.pptx` delivery format. Recommend (1) “current project status and next steps” as the topic when no context exists, (2) “internal decision-makers; obtain approval” as the audience and goal, and (3) an eight-slide problem → evidence → recommendation → next-steps narrative. Ask the user to reply with changes only or use all recommendations; do not create the `.pptx` in the same response.
 
 For a provider- or model-specific request, consult its current official prompting documentation before prescribing model parameters or API features. Do not hardcode transient model behavior.
 
@@ -37,7 +54,7 @@ For `app-start` and `automation-start`, organize the user's intent for handoff t
 
 ## Gather the contract
 
-Collect or infer these fields:
+Collect these fields. Infer non-mandatory fields and use the missing-input recommendation flow for mandatory fields.
 
 1. **Objective** — a concrete result, not a vague quality label.
 2. **Inputs and source of truth** — supplied context, dynamic data, and untrusted external content kept separate.
@@ -69,7 +86,7 @@ Read [references/prompt-patterns.md](references/prompt-patterns.md) for mode tem
 
 ## Codex and Claude Code Goal extension (`/goal`)
 
-Use `goal` as an optional persistent-work extension of the same prompt-author workflow, not as a technical implementation mode. Before writing, extract the six required elements: **Outcome**, **verification surface**, **constraints**, **boundaries**, **iteration policy**, and **blocked stop condition**. Ask at most two questions only when a missing answer changes the goal; otherwise write safe placeholders.
+Use `goal` as an optional persistent-work extension of the same prompt-author workflow, not as a technical implementation mode. Before writing, extract the six required elements: **Outcome**, **verification surface**, **constraints**, **boundaries**, **iteration policy**, and **blocked stop condition**. Apply the missing-input gate; recommend missing elements explicitly instead of replacing them silently or leaving placeholders.
 
 - Make the outcome a single durable end state with an observable done condition; keep background and implementation detail in the surrounding task prompt.
 - Verify against the live machine, repository, tests, benchmarks, or generated artifacts—not memory or an assumed state.
@@ -120,4 +137,4 @@ If the user requests JSON, CSV, a table, or another format, preserve it as the o
 
 ## Quality gate
 
-Before delivering, check that the prompt has a concrete objective, no duplicated rules, no invented skills or capabilities, an output contract, and a verification or honest limitation. When claims or decisions matter, check evidence, uncertainty, assumptions, and human-review gates. Keep casual prompts short and keep technical design decisions with the receiving specialist skill.
+Before delivering, check that every mandatory input for the selected mode is user-supplied or filled by a recommendation previously shown to the user, the prompt has a concrete objective, no duplicated rules, no invented skills or capabilities, an output contract, and a verification or honest limitation. When claims or decisions matter, check evidence, uncertainty, assumptions, and human-review gates. Keep casual prompts short and keep technical design decisions with the receiving specialist skill.
